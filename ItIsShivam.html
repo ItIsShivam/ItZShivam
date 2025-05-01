@@ -3,22 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>It's Shivam's Space ;)</title>
+  <title>Shivam's Music Space</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    html, body {
+      height: 100%;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #ff7e5f, #feb47b);
-      color: white;
       text-align: center;
-      height: 100vh;
       overflow: hidden;
-      transition: background 0.5s, color 0.5s;
+      transition: color 0.5s;
     }
+
+    body.dark {
+      animation: bgCycle 15s infinite linear;
+      color: black;
+    }
+
     body.light {
-      background: linear-gradient(135deg, #ffffff, #eeeeee);
-      color: #333;
+      background: linear-gradient(to top, #ffffff, #eeeeee);
+      color: #222;
     }
+
+    @keyframes bgCycle {
+      0%   { background-color: orange; color: white; }
+      50%  { background-color: white; color: black; }
+      100% { background-color: green; color: white; }
+    }
+
     h1 {
       margin-top: 30px;
       font-size: 2.5em;
@@ -32,7 +43,9 @@
       border-radius: 10px;
       font-size: 1.2em;
       font-style: italic;
+      color: inherit;
     }
+
     body.light .quote-box {
       background: rgba(0,0,0,0.05);
     }
@@ -73,13 +86,12 @@
     .bar {
       width: 12px;
       height: 20px;
-      background: linear-gradient(to top, #00f260, #0575e6);
       border-radius: 3px;
       transition: height 0.1s ease-in-out, background 1s;
     }
 
     body.light .bar {
-      background: linear-gradient(to top, #000000, #434343);
+      background: black;
     }
 
     .footer {
@@ -87,10 +99,11 @@
       bottom: 0;
       width: 100%;
       padding: 15px;
-      background: #111;
+      background: rgba(0,0,0,0.7);
       color: white;
       font-size: 0.9em;
     }
+
     body.light .footer {
       background: #ccc;
       color: #111;
@@ -100,7 +113,7 @@
     body.light a { color: #333; }
   </style>
 </head>
-<body>
+<body class="dark">
   <h1>🎵 Shivam's Music Space</h1>
   <p>I Love Music and Coffee ☕</p>
 
@@ -136,7 +149,6 @@
     const volumeSlider = document.getElementById('volume');
     const bars = document.querySelectorAll('.bar');
     const quoteText = document.getElementById('quoteText');
-
     let isPlaying = false;
 
     const quotes = [
@@ -169,10 +181,13 @@
         const scale = dataArray[i] / 3;
         bar.style.height = `${Math.max(scale, 5)}px`;
 
-        // Change gradient based on height
-        const color1 = `hsl(${scale + 100}, 100%, 50%)`;
-        const color2 = `hsl(${(scale + 180) % 360}, 100%, 50%)`;
-        bar.style.background = `linear-gradient(to top, ${color1}, ${color2})`;
+        if (!document.body.classList.contains('light')) {
+          const color1 = `hsl(${(scale * 2) % 360}, 100%, 50%)`;
+          const color2 = `hsl(${(scale * 2 + 60) % 360}, 100%, 50%)`;
+          bar.style.background = `linear-gradient(to top, ${color1}, ${color2})`;
+        } else {
+          bar.style.background = "black";
+        }
       });
     }
 
@@ -190,6 +205,7 @@
 
     function toggleTheme() {
       document.body.classList.toggle('light');
+      document.body.classList.toggle('dark');
     }
 
     volumeSlider.addEventListener('input', () => {
@@ -201,7 +217,6 @@
       quoteText.textContent = randomQuote;
     }
 
-    // Set initial volume
     audio.volume = volumeSlider.value;
   </script>
 </body>
