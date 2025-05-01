@@ -1,288 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>It's Shivam</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #ff7e5f, #feb47b);
       color: white;
-      overflow-x: hidden;
+      text-align: center;
+      height: 100vh;
+      overflow: hidden;
       transition: background 0.5s, color 0.5s;
     }
 
+    body.light {
+      background: linear-gradient(135deg, #ffffff, #dddddd);
+      color: #333;
+    }
+
     h1 {
-      font-size: 3em;
-      text-align: center;
-      margin-top: 50px;
-      animation: floatText 2s ease-in-out infinite alternate;
-    }
-    @keyframes floatText {
-      from { transform: translateY(0); }
-      to { transform: translateY(-10px); }
-    }
-
-    .quote-box {
       margin-top: 40px;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-      transition: background 0.5s, border-color 0.5s;
-    }
-
-    .quote-text {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: white;
-      background: linear-gradient(90deg, #FFD700, #00e6e6, #ff66cc);
-      background-size: 300% 300%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: gradientShift 5s linear infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      font-size: 2.5em;
     }
 
     .controls {
-      margin-top: 20px;
-      text-align: center;
-      transition: opacity 0.5s ease-in-out;
+      margin: 20px 0;
     }
 
-    .controls button {
+    button {
+      padding: 10px 20px;
+      margin: 10px;
       background-color: #3E2723;
       color: white;
-      padding: 10px 20px;
-      font-size: 1em;
-      margin: 5px;
+      border: none;
       border-radius: 5px;
+      font-size: 1em;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
 
-    .controls button:hover {
+    button:hover {
       background-color: #ff5722;
     }
 
-    input[type="range"] {
-      width: 150px;
-      margin-top: 10px;
+    .volume-slider {
+      width: 200px;
     }
 
     .equalizer {
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      height: 50px;
-      margin-top: 20px;
-      gap: 5px;
+      height: 150px;
+      margin-top: 30px;
+      gap: 4px;
     }
 
     .bar {
-      width: 8px;
-      height: 10px;
-      background: #FFD700;
-      background-size: 200% 200%;
-      border-radius: 2px;
-      transition: height 0.1s, background 0.5s ease-in-out;
-    }
-
-    .footer {
-      background-color: black;
-      color: white;
-      text-align: center;
-      padding: 20px;
-      font-size: 0.9em;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-    }
-
-    .song-info {
-      font-size: 0.8em;
-      color: #ccc;
-      margin-top: 10px;
-    }
-
-    /* Light Mode Styles */
-    body.light {
-      background: linear-gradient(135deg, #00bcd4, #ff9800);
-      color: #333;
-    }
-
-    body.light .quote-box {
-      background: rgba(255, 255, 255, 0.8);
-    }
-
-    body.light .quote-text {
-      background: none;
-      color: #333;
-      -webkit-text-fill-color: initial;
+      width: 10px;
+      height: 20px;
+      background: #ff5722;
+      border-radius: 3px;
+      transition: height 0.1s ease-in-out;
     }
 
     body.light .bar {
-      background: #333;
+      background: #000;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding: 15px;
+      background: #111;
+      color: white;
+      font-size: 0.9em;
     }
 
     body.light .footer {
-      background-color: #f3f3f3;
-      color: #333;
-    }
-
-    /* Media Queries */
-    @media (max-width: 768px) {
-      h1 { font-size: 2em; }
-      .quote-text { font-size: 1.2em; }
-      input[type="range"] { width: 100px; }
+      background: #ccc;
+      color: #111;
     }
   </style>
 </head>
 <body>
-  <div class="content">
-    <h1>Hey, It's M. Shivam</h1>
-    <p style="text-align:center;">I Love Music And Coffee</p>
-    <p style="text-align:center;">My life's rule: Just chill and do good.</p>
-    <p style="text-align:center;">To contact me, mail at <a href="mailto:m9246700@gmail.com">Shivam</a></p>
+  <h1>🎵 Shivam's Music Space</h1>
+  <p>I Love Music and Coffee ☕</p>
 
-    <div class="quote-box">
-      <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
+  <div class="controls">
+    <button onclick="togglePlay()">▶️ Play / ⏸️ Pause</button>
+    <button onclick="toggleTheme()">🌓 Toggle Theme</button><br/>
+    <label for="volume">🔊 Volume:</label>
+    <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01" value="0.5" />
+  </div>
 
-      <div class="controls" id="controls">
-        <button onclick="handleInspire()">🎵 Inspire Me</button>
-        <button onclick="playMusic()">▶️ Play</button>
-        <button onclick="pauseMusic()">⏸️ Pause</button>
-        <button onclick="toggleTheme()">🌓 Toggle Theme</button><br>
-
-        <label for="volumeControl" style="font-size: 0.9em; color: lightgray;">Volume:</label>
-        <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
-      </div>
-
-      <div class="equalizer" id="equalizer">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-    </div>
+  <div class="equalizer" id="equalizer">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
   </div>
 
   <div class="footer">
-    &copy; 2025 M. Shivam | Stay chill and spread good vibes ☕🎵
-    <div class="song-info">
-      Now playing: <b>"Mortals (Funk Remix)"</b> by Warriyo ft. Laura Brehm<br>
-      Music provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
-    </div>
+    Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm |
+    Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
   </div>
 
-  <!-- Audio Element -->
-  <audio id="bgMusic" loop>
-    <source src="mortals-funk-remix.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
+  <audio id="audio" src="mortals-funk-remix.mp3" preload="auto" loop></audio>
 
   <script>
-    const quotes = [
-      "Relax. Refresh. Recharge. ☕",
-      "Life is better with music and coffee. 🎶",
-      "Good vibes only. ✨",
-      "Breathe in peace, breathe out stress.",
-      "Let your soul catch up with your body.",
-      "Don't chase. Attract. 🌈",
-      "Every day is a fresh start.",
-      "You got this. Stay cool. 😎"
-    ];
+    const audio = document.getElementById('audio');
+    const volumeSlider = document.getElementById('volume');
+    const bars = document.querySelectorAll('.bar');
 
-    const music = document.getElementById("bgMusic");
-    const bars = document.querySelectorAll(".bar");
-    const quoteText = document.getElementById("quoteText");
-    const controlsDiv = document.getElementById("controls");
+    let isPlaying = false;
 
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaElementSource(music);
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+    const source = audioCtx.createMediaElementSource(audio);
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 64;
+
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
+
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    function animateBars() {
+    function animateEqualizer() {
+      requestAnimationFrame(animateEqualizer);
       analyser.getByteFrequencyData(dataArray);
       bars.forEach((bar, i) => {
-        const height = dataArray[i] / 2.5;
-        bar.style.height = `${Math.max(5, height)}px`;
-        if (document.body.classList.contains('light')) {
-          bar.style.background = `#333`;  // Black color for light mode
-        } else {
-          bar.style.background = `linear-gradient(135deg, #ff7e5f, #feb47b, #00e6e6)`;
-        }
+        const scale = dataArray[i] / 3;
+        bar.style.height = `${Math.max(scale, 5)}px`;
       });
-      requestAnimationFrame(animateBars);
     }
 
-    function playMusic() {
-      audioCtx.resume();
-      music.play();
-      animateBars();
-      quoteText.classList.add('gradient-active');
-      bars.forEach(bar => bar.classList.add('gradient-bar-active'));
-      resetHideTimer();  // Reset hide timer when music is playing
+    function togglePlay() {
+      if (!isPlaying) {
+        audioCtx.resume();
+        audio.play();
+        isPlaying = true;
+        animateEqualizer();
+      } else {
+        audio.pause();
+        isPlaying = false;
+      }
     }
 
-    function pauseMusic() {
-      music.pause();
-      quoteText.classList.remove('gradient-active');
-      bars.forEach(bar => bar.classList.remove('gradient-bar-active'));
-    }
-
-    function handleInspire() {
-      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteText.textContent = randomQuote;
-      playMusic();
-    }
-
-    function setVolume(value) {
-      music.volume = value;
-    }
-
-    // Theme toggle
     function toggleTheme() {
-      document.body.classList.toggle("light");
+      document.body.classList.toggle('light');
     }
 
-    // Hide controls after 3 seconds of inactivity
-    let hideTimer;
-    function resetHideTimer() {
-      clearTimeout(hideTimer);
-      controlsDiv.style.opacity = "1";
-      hideTimer = setTimeout(() => {
-        controlsDiv.style.opacity = "0";  // Make controls invisible
-      }, 3000);
-    }
-
-    // Reset hide timer on user interaction
-    ['mousemove', 'keydown', 'click'].forEach(evt => {
-      document.addEventListener(evt, resetHideTimer);
+    volumeSlider.addEventListener('input', () => {
+      audio.volume = volumeSlider.value;
     });
 
-    resetHideTimer();
+    // Set initial volume
+    audio.volume = volumeSlider.value;
   </script>
 </body>
 </html>
