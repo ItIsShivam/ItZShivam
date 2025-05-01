@@ -43,17 +43,11 @@
       color: lightblue;
       font-size: 1.2em;
       margin: 15px 0;
-      animation: fadeInUp 1.5s ease-out;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     a {
       color: #3E2723;
       text-decoration: none;
       font-weight: bold;
-      transition: color 0.3s ease;
     }
     a:hover {
       color: #FFD700;
@@ -65,7 +59,6 @@
       padding: 20px;
       border-radius: 10px;
       max-width: 500px;
-      animation: fadeInUp 1s ease-out;
     }
     .quote-text {
       font-size: 1.2em;
@@ -74,6 +67,12 @@
     }
     .controls {
       margin-top: 20px;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
     }
     button {
       background-color: #3E2723;
@@ -84,44 +83,25 @@
       margin: 5px;
       border-radius: 5px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
-    button:hover {
-      background-color: #5D4037;
-    }
-
     input[type=range] {
       width: 150px;
       margin-top: 10px;
     }
-
     .equalizer {
       display: flex;
       justify-content: center;
+      align-items: flex-end;
+      height: 50px;
       margin-top: 20px;
-      height: 40px;
-      gap: 5px;
+      gap: 4px;
     }
-
     .bar {
-      width: 8px;
+      width: 6px;
       background: #FFD700;
-      animation: equalize 1s infinite;
-      animation-play-state: paused;
+      height: 10px;
+      transition: height 0.1s;
     }
-
-    .bar:nth-child(1) { animation-delay: 0s; }
-    .bar:nth-child(2) { animation-delay: 0.1s; }
-    .bar:nth-child(3) { animation-delay: 0.2s; }
-    .bar:nth-child(4) { animation-delay: 0.3s; }
-    .bar:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes equalize {
-      0% { height: 10px; }
-      50% { height: 35px; }
-      100% { height: 10px; }
-    }
-
     .footer {
       background-color: black;
       color: white;
@@ -129,13 +109,11 @@
       padding: 20px;
       font-size: 0.9em;
     }
-
     .song-info {
       font-size: 0.9em;
       color: #ccc;
       margin-top: 10px;
     }
-
     @media (max-width: 768px) {
       h1 { font-size: 2em; }
       p, .quote-text { font-size: 1em; }
@@ -144,7 +122,7 @@
   </style>
 </head>
 <body>
-  <div class="rainbow">
+  <div class="rainbow" onmousemove="resetHideTimer()" onkeydown="resetHideTimer()">
     <h1><b><i>Hey, It's M. Shivam</i></b></h1>
     <p><u>I Love Music And Coffee</u></p>
     <p>My life's rule is: Just chill and do good.</p>
@@ -152,14 +130,17 @@
 
     <div class="quote-box">
       <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
-      <div class="controls">
+      <div class="controls" id="controls">
         <button onclick="handleInspire()">🎵 Inspire Me</button>
-        <button onclick="playMusic()">▶️ Play Music</button>
-        <button onclick="pauseMusic()">⏸️ Pause Music</button><br>
+        <button onclick="playMusic()">▶️ Play</button>
+        <button onclick="pauseMusic()">⏸️ Pause</button><br>
         <label for="volumeControl" style="font-size: 0.9em; color: lightgray;">Volume:</label>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
       </div>
       <div class="equalizer" id="equalizer">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
@@ -177,7 +158,7 @@
     </div>
   </div>
 
-  <!-- Music player -->
+  <!-- Audio Element -->
   <audio id="bgMusic" loop>
     <source src="mortals-funk-remix.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
@@ -196,12 +177,36 @@
     ];
 
     const music = document.getElementById("bgMusic");
-    const bars = document.querySelectorAll('.bar');
+    const bars = document.querySelectorAll(".bar");
+    const volumeControl = document.getElementById("volumeControl");
+    const controlsDiv = document.getElementById("controls");
 
-    function showRandomQuote() {
-      const quoteText = document.getElementById("quoteText");
-      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteText.textContent = randomQuote;
+    // Web Audio API setup
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaElementSource(music);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    function animateBars() {
+      analyser.getByteFrequencyData(dataArray);
+      bars.forEach((bar, i) => {
+        const height = dataArray[i] / 2.5;
+        bar.style.height = `${Math.max(5, height)}px`;
+      });
+      requestAnimationFrame(animateBars);
+    }
+
+    function playMusic() {
+      audioCtx.resume();
+      music.play();
+    }
+
+    function pauseMusic() {
+      music.pause();
     }
 
     function handleInspire() {
@@ -209,19 +214,31 @@
       playMusic();
     }
 
-    function playMusic() {
-      music.play();
-      bars.forEach(bar => bar.style.animationPlayState = 'running');
-    }
-
-    function pauseMusic() {
-      music.pause();
-      bars.forEach(bar => bar.style.animationPlayState = 'paused');
+    function showRandomQuote() {
+      const quoteText = document.getElementById("quoteText");
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteText.textContent = randomQuote;
     }
 
     function setVolume(value) {
       music.volume = value;
     }
+
+    // Equalizer starts animating when music plays
+    music.addEventListener('play', () => {
+      animateBars();
+    });
+
+    // Auto-hide controls after 5 seconds
+    let hideTimer;
+    function resetHideTimer() {
+      clearTimeout(hideTimer);
+      controlsDiv.classList.remove("hidden");
+      hideTimer = setTimeout(() => {
+        controlsDiv.classList.add("hidden");
+      }, 5000);
+    }
+    resetHideTimer();
   </script>
 </body>
 </html>
