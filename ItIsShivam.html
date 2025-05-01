@@ -46,14 +46,8 @@
       animation: fadeInUp 1.5s ease-out;
     }
     @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     a {
       color: #3E2723;
@@ -64,7 +58,6 @@
     a:hover {
       color: #FFD700;
     }
-
     .quote-box {
       margin-top: 30px;
       background: rgba(0, 0, 0, 0.5);
@@ -74,13 +67,11 @@
       max-width: 500px;
       animation: fadeInUp 1s ease-out;
     }
-
     .quote-text {
       font-size: 1.2em;
       color: #FFD700;
       margin-bottom: 15px;
     }
-
     button {
       background-color: #3E2723;
       color: white;
@@ -91,11 +82,9 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #5D4037;
     }
-
     .footer {
       background-color: black;
       color: white;
@@ -103,7 +92,6 @@
       padding: 20px;
       font-size: 0.9em;
     }
-
     @media (max-width: 768px) {
       h1 { font-size: 2em; }
       p, .quote-text { font-size: 1em; }
@@ -117,12 +105,51 @@
     <p>My life's rule is: Just chill and do good.</p>
     <p><i>To contact me, mail at </i><a href="mailto:m9246700@gmail.com">Shivam</a></p>
 
-    <!-- Quote Generator Section -->
+    <!-- Quote Generator + Music -->
     <div class="quote-box">
       <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
-      <button onclick="showRandomQuote()">🎵 Inspire Me</button>
+      <button onclick="handleInspire()">🎵 Inspire Me</button>
     </div>
   </div>
 
   <div class="footer">
     &copy; 2025 M. Shivam | Stay chill and spread good vibes ☕🎵
+  </div>
+
+  <!-- Background music (replace 'music.mp3' with your own audio file) -->
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const quotes = [
+      "Relax. Refresh. Recharge. ☕",
+      "Life is better with music and coffee. 🎶",
+      "Good vibes only. ✨",
+      "Breathe in peace, breathe out stress.",
+      "Let your soul catch up with your body.",
+      "Don't chase. Attract. 🌈",
+      "Every day is a fresh start.",
+      "You got this. Stay cool. 😎"
+    ];
+
+    let musicStarted = false;
+
+    function showRandomQuote() {
+      const quoteText = document.getElementById("quoteText");
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteText.textContent = randomQuote;
+    }
+
+    function handleInspire() {
+      showRandomQuote();
+      const music = document.getElementById("bgMusic");
+      if (!musicStarted) {
+        music.play();
+        musicStarted = true;
+      }
+    }
+  </script>
+</body>
+</html>
