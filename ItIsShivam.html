@@ -133,7 +133,7 @@
     }
 
     body.light .bar {
-      background: #3E2723;
+      background: #333;
     }
 
     body.light .footer {
@@ -227,7 +227,11 @@
       bars.forEach((bar, i) => {
         const height = dataArray[i] / 2.5;
         bar.style.height = `${Math.max(5, height)}px`;
-        bar.style.background = `linear-gradient(135deg, #ff7e5f, #feb47b, #00e6e6)`;
+        if (document.body.classList.contains('light')) {
+          bar.style.background = `#333`;  // Black color for light mode
+        } else {
+          bar.style.background = `linear-gradient(135deg, #ff7e5f, #feb47b, #00e6e6)`;
+        }
       });
       requestAnimationFrame(animateBars);
     }
