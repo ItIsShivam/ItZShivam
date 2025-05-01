@@ -1,1 +1,1 @@
-Hi this is my new git Repo of my details
+The code is created only for fun ;)
