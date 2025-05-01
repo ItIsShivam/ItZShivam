@@ -59,6 +59,7 @@
     .controls {
       margin-top: 20px;
       text-align: center;
+      transition: opacity 0.5s ease-in-out;
     }
 
     .controls button {
@@ -242,6 +243,7 @@
       animateBars();
       quoteText.classList.add('gradient-active');
       bars.forEach(bar => bar.classList.add('gradient-bar-active'));
+      resetHideTimer();  // Reset hide timer when music is playing
     }
 
     function pauseMusic() {
@@ -265,13 +267,13 @@
       document.body.classList.toggle("light");
     }
 
-    // Auto-hide controls after 3 seconds
+    // Hide controls after 3 seconds of inactivity
     let hideTimer;
     function resetHideTimer() {
       clearTimeout(hideTimer);
-      controlsDiv.classList.remove("hidden");
+      controlsDiv.style.opacity = "1";
       hideTimer = setTimeout(() => {
-        controlsDiv.classList.add("hidden");
+        controlsDiv.style.opacity = "0";  // Make controls invisible
       }, 3000);
     }
 
