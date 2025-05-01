@@ -11,6 +11,7 @@
       font-family: 'Poppins', sans-serif;
       color: white;
       overflow-x: hidden;
+      transition: background 0.5s, color 0.5s;
     }
     .rainbow {
       width: 100%;
@@ -59,12 +60,27 @@
       padding: 20px;
       border-radius: 10px;
       max-width: 500px;
+      transition: background 0.5s, border-color 0.5s;
     }
     .quote-text {
       font-size: 1.2em;
-      color: #FFD700;
+      font-weight: bold;
       margin-bottom: 15px;
+      transition: background 1s ease;
+      background: linear-gradient(90deg, #FFD700, #00e6e6, #ff66cc);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
+    .gradient-active {
+      animation: gradientShift 5s linear infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     .controls {
       margin-top: 20px;
       opacity: 1;
@@ -88,6 +104,7 @@
       width: 150px;
       margin-top: 10px;
     }
+
     .equalizer {
       display: flex;
       justify-content: center;
@@ -98,22 +115,68 @@
     }
     .bar {
       width: 6px;
-      background: #FFD700;
       height: 10px;
+      background: linear-gradient(180deg, #FFD700, #FF5722, #00e6e6);
+      background-size: 200% 200%;
+      border-radius: 2px;
       transition: height 0.1s;
     }
+    .gradient-bar-active {
+      animation: barGradientShift 4s linear infinite;
+    }
+    @keyframes barGradientShift {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0% 0%; }
+    }
+
     .footer {
       background-color: black;
       color: white;
       text-align: center;
       padding: 20px;
       font-size: 0.9em;
+      transition: background 0.5s, color 0.5s;
     }
     .song-info {
       font-size: 0.9em;
       color: #ccc;
       margin-top: 10px;
     }
+
+    /* LIGHT MODE STYLES */
+    body.light {
+      background-color: #f3f3f3;
+      color: #111;
+    }
+    body.light .rainbow {
+      background: linear-gradient(270deg, #fff7e6, #e6f7ff, #e6ffe6);
+    }
+    body.light .quote-box {
+      background-color: #fff;
+      border-color: #ccc;
+    }
+    body.light .quote-text {
+      color: #333;
+      -webkit-text-fill-color: initial;
+      background: none;
+      animation: none;
+    }
+    body.light .bar {
+      background: #3E2723;
+    }
+    body.light button {
+      background-color: #333;
+      color: white;
+    }
+    body.light .footer {
+      background-color: #eee;
+      color: #333;
+    }
+    body.light a {
+      color: #3E2723;
+    }
+
     @media (max-width: 768px) {
       h1 { font-size: 2em; }
       p, .quote-text { font-size: 1em; }
@@ -133,19 +196,14 @@
       <div class="controls" id="controls">
         <button onclick="handleInspire()">🎵 Inspire Me</button>
         <button onclick="playMusic()">▶️ Play</button>
-        <button onclick="pauseMusic()">⏸️ Pause</button><br>
+        <button onclick="pauseMusic()">⏸️ Pause</button>
+        <button onclick="toggleTheme()">🌓 Toggle Theme</button><br>
         <label for="volumeControl" style="font-size: 0.9em; color: lightgray;">Volume:</label>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
       </div>
       <div class="equalizer" id="equalizer">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
       </div>
     </div>
   </div>
@@ -178,10 +236,9 @@
 
     const music = document.getElementById("bgMusic");
     const bars = document.querySelectorAll(".bar");
-    const volumeControl = document.getElementById("volumeControl");
+    const quoteText = document.getElementById("quoteText");
     const controlsDiv = document.getElementById("controls");
 
-    // Web Audio API setup
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const source = audioCtx.createMediaElementSource(music);
     const analyser = audioCtx.createAnalyser();
@@ -203,33 +260,33 @@
     function playMusic() {
       audioCtx.resume();
       music.play();
+      animateBars();
+      quoteText.classList.add('gradient-active');
+      bars.forEach(bar => bar.classList.add('gradient-bar-active'));
     }
 
     function pauseMusic() {
       music.pause();
+      quoteText.classList.remove('gradient-active');
+      bars.forEach(bar => bar.classList.remove('gradient-bar-active'));
     }
 
     function handleInspire() {
-      showRandomQuote();
-      playMusic();
-    }
-
-    function showRandomQuote() {
-      const quoteText = document.getElementById("quoteText");
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
       quoteText.textContent = randomQuote;
+      playMusic();
     }
 
     function setVolume(value) {
       music.volume = value;
     }
 
-    // Equalizer starts animating when music plays
-    music.addEventListener('play', () => {
-      animateBars();
-    });
+    // Theme toggle
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
 
-    // Auto-hide controls after 5 seconds
+    // Auto-hide controls
     let hideTimer;
     function resetHideTimer() {
       clearTimeout(hideTimer);
