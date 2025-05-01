@@ -96,7 +96,7 @@
       background: #FFD700;
       background-size: 200% 200%;
       border-radius: 2px;
-      transition: height 0.1s;
+      transition: height 0.1s, background 0.5s ease-in-out;
     }
 
     .footer {
@@ -159,7 +159,7 @@
     <div class="quote-box">
       <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
 
-      <div class="controls">
+      <div class="controls" id="controls">
         <button onclick="handleInspire()">🎵 Inspire Me</button>
         <button onclick="playMusic()">▶️ Play</button>
         <button onclick="pauseMusic()">⏸️ Pause</button>
@@ -211,7 +211,7 @@
     const music = document.getElementById("bgMusic");
     const bars = document.querySelectorAll(".bar");
     const quoteText = document.getElementById("quoteText");
-    const controlsDiv = document.querySelector(".controls");
+    const controlsDiv = document.getElementById("controls");
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const source = audioCtx.createMediaElementSource(music);
@@ -227,6 +227,7 @@
       bars.forEach((bar, i) => {
         const height = dataArray[i] / 2.5;
         bar.style.height = `${Math.max(5, height)}px`;
+        bar.style.background = `linear-gradient(135deg, #ff7e5f, #feb47b, #00e6e6)`;
       });
       requestAnimationFrame(animateBars);
     }
@@ -260,15 +261,21 @@
       document.body.classList.toggle("light");
     }
 
-    // Auto-hide controls
+    // Auto-hide controls after 3 seconds
     let hideTimer;
     function resetHideTimer() {
       clearTimeout(hideTimer);
       controlsDiv.classList.remove("hidden");
       hideTimer = setTimeout(() => {
         controlsDiv.classList.add("hidden");
-      }, 5000);
+      }, 3000);
     }
+
+    // Reset hide timer on user interaction
+    ['mousemove', 'keydown', 'click'].forEach(evt => {
+      document.addEventListener(evt, resetHideTimer);
+    });
+
     resetHideTimer();
   </script>
 </body>
