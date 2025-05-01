@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shivam's Dynamic Music Player</title>
+  <title>It's Shivam's Space ;)</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -15,15 +15,26 @@
       overflow: hidden;
       transition: background 0.5s, color 0.5s;
     }
-
     body.light {
-      background: linear-gradient(135deg, #ffffff, #dddddd);
+      background: linear-gradient(135deg, #ffffff, #eeeeee);
       color: #333;
     }
-
     h1 {
-      margin-top: 40px;
+      margin-top: 30px;
       font-size: 2.5em;
+    }
+
+    .quote-box {
+      margin: 20px auto;
+      padding: 15px 20px;
+      max-width: 600px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      font-size: 1.2em;
+      font-style: italic;
+    }
+    body.light .quote-box {
+      background: rgba(0,0,0,0.05);
     }
 
     .controls {
@@ -32,13 +43,14 @@
 
     button {
       padding: 10px 20px;
-      margin: 10px;
+      margin: 10px 5px;
       background-color: #3E2723;
       color: white;
       border: none;
       border-radius: 5px;
       font-size: 1em;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
     button:hover {
@@ -54,20 +66,20 @@
       justify-content: center;
       align-items: flex-end;
       height: 150px;
-      margin-top: 30px;
+      margin-top: 20px;
       gap: 4px;
     }
 
     .bar {
-      width: 10px;
+      width: 12px;
       height: 20px;
-      background: #ff5722;
+      background: linear-gradient(to top, #00f260, #0575e6);
       border-radius: 3px;
-      transition: height 0.1s ease-in-out;
+      transition: height 0.1s ease-in-out, background 1s;
     }
 
     body.light .bar {
-      background: #000;
+      background: linear-gradient(to top, #000000, #434343);
     }
 
     .footer {
@@ -79,48 +91,64 @@
       color: white;
       font-size: 0.9em;
     }
-
     body.light .footer {
       background: #ccc;
       color: #111;
     }
+
+    a { color: #ffcc80; }
+    body.light a { color: #333; }
   </style>
 </head>
 <body>
   <h1>🎵 Shivam's Music Space</h1>
   <p>I Love Music and Coffee ☕</p>
 
+  <!-- Quote Display -->
+  <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
+
+  <!-- Controls -->
   <div class="controls">
+    <button onclick="generateQuote()">💡 Inspire Me</button>
     <button onclick="togglePlay()">▶️ Play / ⏸️ Pause</button>
     <button onclick="toggleTheme()">🌓 Toggle Theme</button><br/>
     <label for="volume">🔊 Volume:</label>
     <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01" value="0.5" />
   </div>
 
+  <!-- Equalizer -->
   <div class="equalizer" id="equalizer">
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
   </div>
 
+  <!-- Footer -->
   <div class="footer">
     Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm |
     Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
   </div>
 
+  <!-- Music -->
   <audio id="audio" src="mortals-funk-remix.mp3" preload="auto" loop></audio>
 
   <script>
     const audio = document.getElementById('audio');
     const volumeSlider = document.getElementById('volume');
     const bars = document.querySelectorAll('.bar');
+    const quoteText = document.getElementById('quoteText');
 
     let isPlaying = false;
+
+    const quotes = [
+      "Relax. Refresh. Recharge. ☕",
+      "Life is better with music and coffee. 🎶",
+      "Good vibes only. ✨",
+      "Breathe in peace, breathe out stress.",
+      "Let your soul catch up with your body.",
+      "Don't chase. Attract. 🌈",
+      "Every day is a fresh start.",
+      "You got this. Stay cool. 😎"
+    ];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
@@ -140,6 +168,11 @@
       bars.forEach((bar, i) => {
         const scale = dataArray[i] / 3;
         bar.style.height = `${Math.max(scale, 5)}px`;
+
+        // Change gradient based on height
+        const color1 = `hsl(${scale + 100}, 100%, 50%)`;
+        const color2 = `hsl(${(scale + 180) % 360}, 100%, 50%)`;
+        bar.style.background = `linear-gradient(to top, ${color1}, ${color2})`;
       });
     }
 
@@ -162,6 +195,11 @@
     volumeSlider.addEventListener('input', () => {
       audio.volume = volumeSlider.value;
     });
+
+    function generateQuote() {
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteText.textContent = randomQuote;
+    }
 
     // Set initial volume
     audio.volume = volumeSlider.value;
