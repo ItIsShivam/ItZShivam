@@ -72,12 +72,16 @@
       color: #FFD700;
       margin-bottom: 15px;
     }
+    .controls {
+      margin-top: 20px;
+    }
     button {
       background-color: #3E2723;
       color: white;
       border: none;
       padding: 10px 20px;
       font-size: 1em;
+      margin: 5px;
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
@@ -92,6 +96,11 @@
       padding: 20px;
       font-size: 0.9em;
     }
+    .song-info {
+      font-size: 0.9em;
+      color: #ccc;
+      margin-top: 10px;
+    }
     @media (max-width: 768px) {
       h1 { font-size: 2em; }
       p, .quote-text { font-size: 1em; }
@@ -105,20 +114,27 @@
     <p>My life's rule is: Just chill and do good.</p>
     <p><i>To contact me, mail at </i><a href="mailto:m9246700@gmail.com">Shivam</a></p>
 
-    <!-- Quote Generator + Music -->
     <div class="quote-box">
       <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
-      <button onclick="handleInspire()">🎵 Inspire Me</button>
+      <div class="controls">
+        <button onclick="handleInspire()">🎵 Inspire Me</button>
+        <button onclick="playMusic()">▶️ Play Music</button>
+        <button onclick="pauseMusic()">⏸️ Pause Music</button>
+      </div>
     </div>
   </div>
 
   <div class="footer">
     &copy; 2025 M. Shivam | Stay chill and spread good vibes ☕🎵
+    <div class="song-info">
+      Now playing: <b>"Mortals (Funk Remix)"</b> by Warriyo ft. Laura Brehm<br>
+      Music provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NoCopyrightSounds</a>
+    </div>
   </div>
 
-  <!-- Background music (replace 'music.mp3' with your own audio file) -->
+  <!-- Music player -->
   <audio id="bgMusic" loop>
-    <source src="music.mp3" type="audio/mpeg">
+    <source src="mortals-funk-remix.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 
@@ -134,8 +150,6 @@
       "You got this. Stay cool. 😎"
     ];
 
-    let musicStarted = false;
-
     function showRandomQuote() {
       const quoteText = document.getElementById("quoteText");
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
@@ -144,11 +158,17 @@
 
     function handleInspire() {
       showRandomQuote();
+      playMusic();
+    }
+
+    function playMusic() {
       const music = document.getElementById("bgMusic");
-      if (!musicStarted) {
-        music.play();
-        musicStarted = true;
-      }
+      music.play();
+    }
+
+    function pauseMusic() {
+      const music = document.getElementById("bgMusic");
+      music.pause();
     }
   </script>
 </body>
