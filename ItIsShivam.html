@@ -1,119 +1,109 @@
-const express = require("express");
-const app = express();
-const PORT = 3000;
-
-// Serve static files (CSS, JS)
-app.use(express.static("public"));
-
-// Set view engine to EJS
-app.set("view engine", "ejs");
-
-// Home Route
-app.get("/", (req, res) => {
-    const data = {
-        name: "M. Shivam",
-        interests: ["Music", "Coffee"],
-        rule: "Just chill and do good",
-        email: "devsparadise999@duck.com",
-        currentTime: new Date().toLocaleTimeString(),
-    };
-    res.render("index", { data });
-});
-
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
-
-/**
- * EJS Template (index.ejs)
- */
-const ejsTemplate = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= data.name %>'s Website</title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="UTF-8">
+  <title>It's Shivam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: black;
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .rainbow {
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(270deg, orange, white, green);
+      background-size: 600% 600%;
+      animation: rainbowMove 10s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    @keyframes rainbowMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #3E2723;
+      animation: floatText 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatText {
+      from { transform: translateY(0); }
+      to { transform: translateY(-10px); }
+    }
+
+    p {
+      color: lightblue;
+      font-size: 1.2em;
+      margin: 15px 0;
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    a {
+      color: #3E2723;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #FFD700;
+    }
+
+    .footer {
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+      p {
+        font-size: 1em;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="rainbow">
-        <h1><b><i>Hey It's <%= data.name %></i></b></h1>
-        <p><u>I Love <%= data.interests.join(" and ") %></u></p>
-        <p>My life's rule is: <%= data.rule %></p>
-        <p><i>To contact me, mail at:</i> <a href="mailto:<%= data.email %>"><%= data.name %></a></p>
-        <p>Current Time: <%= data.currentTime %></p>
-    </div>
-    <footer class="footer">
-        <p>© <%= new Date().getFullYear() %> <%= data.name %>. All rights reserved.</p>
-    </footer>
+  <div class="rainbow">
+    <h1><b><i>Hey, It's M. Shivam</i></b></h1>
+    <p><u>I Love Music And Coffee</u></p>
+    <p>My life's rule is: Just chill and do good.</p>
+    <p><i>To contact me, mail at </i><a href="mailto:m9246700@gmail.com">Shivam</a></p>
+  </div>
+  <div class="footer">
+    &copy; 2025 M. Shivam | Stay chill and spread good vibes ☕🎵
+  </div>
 </body>
 </html>
-`;
-
-// Write EJS Template to Views Directory
-const fs = require("fs");
-const path = require("path");
-const viewsPath = path.join(__dirname, "views");
-const publicPath = path.join(__dirname, "public/css");
-
-// Ensure directories exist
-if (!fs.existsSync(viewsPath)) fs.mkdirSync(viewsPath, { recursive: true });
-if (!fs.existsSync(publicPath)) fs.mkdirSync(publicPath, { recursive: true });
-
-// Write EJS file
-fs.writeFileSync(path.join(viewsPath, "index.ejs"), ejsTemplate.trim());
-
-// CSS Styles
-const cssStyles = `
-body {
-    background-color: black;
-    font-family: Arial, sans-serif;
-}
-
-h1 {
-    color: #3E2723;
-    text-align: center;
-    font-size: 50px;
-    margin-top: 50px;
-}
-
-p {
-    color: blue;
-    font-size: 20px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-a {
-    color: #3E2723;
-    text-decoration: none;
-}
-
-.rainbow {
-    width: 100%;
-    height: 500px;
-    background: linear-gradient(to right, orange, white, green);
-    animation: rainbow 10s infinite;
-}
-
-@keyframes rainbow {
-    0% { background-color: orange; }
-    50% { background-color: white; }
-    100% { background-color: green; }
-}
-
-.footer {
-    background-color: black;
-    color: white;
-    text-align: center;
-    padding: 20px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-`;
-
-// Write CSS file
-fs.writeFileSync(path.join(publicPath, "styles.css"), cssStyles.trim());
