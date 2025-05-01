@@ -1,23 +1,119 @@
-    <!DOCTYPE html>
-    <head> 
-        <title>It'S Shivam</title> 
-        <style>
-        body { background-color: black;}
-        h1 { color: #3E2723; text-align: center; font-size: 50px; margin-top: 50px;}
-        p { color: Blue; font-size: 20px; text-align: center; margin-top: 50px;}
-        a { color : #3E2723}
-        .rainbow { width: 100%; height: 500px; background: linear-gradient(to right, orange, white, green,);animation: rainbow 10s infinite;}
-                  @keyframes rainbow {
-        0% {background-color: orange;}
-        50% {background-color: white;}
-        100% {background-color: green;}}
-        .footer { background-color: black; color: white; text-align: center; padding: 20px;}
-        </style>
-    </head>
-    <body>            
-    <div class="rainbow"><h1><b><i>Hey It's M.Shivam</i></b></h1><br>            
-            <p><u>I Love Music And Coffee</u></p>
-            <p>My life's rule is just chill and do good</p>
-            <p><i>To contact Me Mail @</i><a href=mailto:"devsparadise999@duck.com">Shivam</a></p></div>
-    </body>
+const express = require("express");
+const app = express();
+const PORT = 3000;
+
+// Serve static files (CSS, JS)
+app.use(express.static("public"));
+
+// Set view engine to EJS
+app.set("view engine", "ejs");
+
+// Home Route
+app.get("/", (req, res) => {
+    const data = {
+        name: "M. Shivam",
+        interests: ["Music", "Coffee"],
+        rule: "Just chill and do good",
+        email: "devsparadise999@duck.com",
+        currentTime: new Date().toLocaleTimeString(),
+    };
+    res.render("index", { data });
+});
+
+// Start Server
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
+
+/**
+ * EJS Template (index.ejs)
+ */
+const ejsTemplate = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= data.name %>'s Website</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="rainbow">
+        <h1><b><i>Hey It's <%= data.name %></i></b></h1>
+        <p><u>I Love <%= data.interests.join(" and ") %></u></p>
+        <p>My life's rule is: <%= data.rule %></p>
+        <p><i>To contact me, mail at:</i> <a href="mailto:<%= data.email %>"><%= data.name %></a></p>
+        <p>Current Time: <%= data.currentTime %></p>
+    </div>
+    <footer class="footer">
+        <p>© <%= new Date().getFullYear() %> <%= data.name %>. All rights reserved.</p>
+    </footer>
+</body>
 </html>
+`;
+
+// Write EJS Template to Views Directory
+const fs = require("fs");
+const path = require("path");
+const viewsPath = path.join(__dirname, "views");
+const publicPath = path.join(__dirname, "public/css");
+
+// Ensure directories exist
+if (!fs.existsSync(viewsPath)) fs.mkdirSync(viewsPath, { recursive: true });
+if (!fs.existsSync(publicPath)) fs.mkdirSync(publicPath, { recursive: true });
+
+// Write EJS file
+fs.writeFileSync(path.join(viewsPath, "index.ejs"), ejsTemplate.trim());
+
+// CSS Styles
+const cssStyles = `
+body {
+    background-color: black;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #3E2723;
+    text-align: center;
+    font-size: 50px;
+    margin-top: 50px;
+}
+
+p {
+    color: blue;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+a {
+    color: #3E2723;
+    text-decoration: none;
+}
+
+.rainbow {
+    width: 100%;
+    height: 500px;
+    background: linear-gradient(to right, orange, white, green);
+    animation: rainbow 10s infinite;
+}
+
+@keyframes rainbow {
+    0% { background-color: orange; }
+    50% { background-color: white; }
+    100% { background-color: green; }
+}
+
+.footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+`;
+
+// Write CSS file
+fs.writeFileSync(path.join(publicPath, "styles.css"), cssStyles.trim());
