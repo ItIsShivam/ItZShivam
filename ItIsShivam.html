@@ -2,79 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>It's Shivam</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body {
-      background-color: black;
       font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #ff7e5f, #feb47b);
       color: white;
       overflow-x: hidden;
       transition: background 0.5s, color 0.5s;
     }
-    .rainbow {
-      width: 100%;
-      height: 100vh;
-      background: linear-gradient(270deg, orange, white, green);
-      background-size: 600% 600%;
-      animation: rainbowMove 10s ease infinite;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 20px;
-    }
-    @keyframes rainbowMove {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
+
     h1 {
       font-size: 3em;
-      color: #3E2723;
+      text-align: center;
+      margin-top: 50px;
       animation: floatText 2s ease-in-out infinite alternate;
     }
     @keyframes floatText {
       from { transform: translateY(0); }
       to { transform: translateY(-10px); }
     }
-    p {
-      color: lightblue;
-      font-size: 1.2em;
-      margin: 15px 0;
-    }
-    a {
-      color: #3E2723;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    a:hover {
-      color: #FFD700;
-    }
+
     .quote-box {
-      margin-top: 30px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid #3E2723;
+      margin-top: 40px;
       padding: 20px;
+      background: rgba(0, 0, 0, 0.5);
       border-radius: 10px;
-      max-width: 500px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
       transition: background 0.5s, border-color 0.5s;
     }
+
     .quote-text {
-      font-size: 1.2em;
+      font-size: 1.5em;
       font-weight: bold;
-      margin-bottom: 15px;
-      transition: background 1s ease;
+      color: white;
       background: linear-gradient(90deg, #FFD700, #00e6e6, #ff66cc);
       background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    .gradient-active {
       animation: gradientShift 5s linear infinite;
     }
+
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -83,24 +58,25 @@
 
     .controls {
       margin-top: 20px;
-      opacity: 1;
-      transition: opacity 0.5s ease;
+      text-align: center;
     }
-    .hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    button {
+
+    .controls button {
       background-color: #3E2723;
       color: white;
-      border: none;
       padding: 10px 20px;
       font-size: 1em;
       margin: 5px;
       border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    input[type=range] {
+
+    .controls button:hover {
+      background-color: #ff5722;
+    }
+
+    input[type="range"] {
       width: 150px;
       margin-top: 10px;
     }
@@ -111,23 +87,16 @@
       align-items: flex-end;
       height: 50px;
       margin-top: 20px;
-      gap: 4px;
+      gap: 5px;
     }
+
     .bar {
-      width: 6px;
+      width: 8px;
       height: 10px;
-      background: linear-gradient(180deg, #FFD700, #FF5722, #00e6e6);
+      background: #FFD700;
       background-size: 200% 200%;
       border-radius: 2px;
       transition: height 0.1s;
-    }
-    .gradient-bar-active {
-      animation: barGradientShift 4s linear infinite;
-    }
-    @keyframes barGradientShift {
-      0% { background-position: 0% 0%; }
-      50% { background-position: 100% 100%; }
-      100% { background-position: 0% 0%; }
     }
 
     .footer {
@@ -136,74 +105,79 @@
       text-align: center;
       padding: 20px;
       font-size: 0.9em;
-      transition: background 0.5s, color 0.5s;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
     }
+
     .song-info {
-      font-size: 0.9em;
+      font-size: 0.8em;
       color: #ccc;
       margin-top: 10px;
     }
 
-    /* LIGHT MODE STYLES */
+    /* Light Mode Styles */
     body.light {
-      background-color: #f3f3f3;
-      color: #111;
+      background: linear-gradient(135deg, #00bcd4, #ff9800);
+      color: #333;
     }
-    body.light .rainbow {
-      background: linear-gradient(270deg, #fff7e6, #e6f7ff, #e6ffe6);
-    }
+
     body.light .quote-box {
-      background-color: #fff;
-      border-color: #ccc;
+      background: rgba(255, 255, 255, 0.8);
     }
+
     body.light .quote-text {
+      background: none;
       color: #333;
       -webkit-text-fill-color: initial;
-      background: none;
-      animation: none;
     }
+
     body.light .bar {
       background: #3E2723;
     }
-    body.light button {
-      background-color: #333;
-      color: white;
-    }
+
     body.light .footer {
-      background-color: #eee;
+      background-color: #f3f3f3;
       color: #333;
     }
-    body.light a {
-      color: #3E2723;
-    }
 
+    /* Media Queries */
     @media (max-width: 768px) {
       h1 { font-size: 2em; }
-      p, .quote-text { font-size: 1em; }
-      input[type=range] { width: 100px; }
+      .quote-text { font-size: 1.2em; }
+      input[type="range"] { width: 100px; }
     }
   </style>
 </head>
 <body>
-  <div class="rainbow" onmousemove="resetHideTimer()" onkeydown="resetHideTimer()">
-    <h1><b><i>Hey, It's M. Shivam</i></b></h1>
-    <p><u>I Love Music And Coffee</u></p>
-    <p>My life's rule is: Just chill and do good.</p>
-    <p><i>To contact me, mail at </i><a href="mailto:m9246700@gmail.com">Shivam</a></p>
+  <div class="content">
+    <h1>Hey, It's M. Shivam</h1>
+    <p style="text-align:center;">I Love Music And Coffee</p>
+    <p style="text-align:center;">My life's rule: Just chill and do good.</p>
+    <p style="text-align:center;">To contact me, mail at <a href="mailto:m9246700@gmail.com">Shivam</a></p>
 
     <div class="quote-box">
       <div class="quote-text" id="quoteText">Click the button for a chill quote!</div>
-      <div class="controls" id="controls">
+
+      <div class="controls">
         <button onclick="handleInspire()">🎵 Inspire Me</button>
         <button onclick="playMusic()">▶️ Play</button>
         <button onclick="pauseMusic()">⏸️ Pause</button>
         <button onclick="toggleTheme()">🌓 Toggle Theme</button><br>
+
         <label for="volumeControl" style="font-size: 0.9em; color: lightgray;">Volume:</label>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
       </div>
+
       <div class="equalizer" id="equalizer">
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
       </div>
     </div>
   </div>
@@ -237,7 +211,7 @@
     const music = document.getElementById("bgMusic");
     const bars = document.querySelectorAll(".bar");
     const quoteText = document.getElementById("quoteText");
-    const controlsDiv = document.getElementById("controls");
+    const controlsDiv = document.querySelector(".controls");
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const source = audioCtx.createMediaElementSource(music);
