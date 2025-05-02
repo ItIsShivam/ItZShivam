@@ -8,7 +8,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       height: 100%;
-      font-family: 'Segoe UI Emoji', 'Segoe UI', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+      font-family: 'Segoe UI', 'Segoe UI Emoji', sans-serif;
       text-align: center;
       overflow: hidden;
       transition: color 0.5s;
@@ -37,8 +37,13 @@
     }
 
     h1 {
-      margin-top: 30px;
-      font-size: 2.5em;
+      margin-top: 20px;
+      font-size: 2.2em;
+    }
+
+    p {
+      margin-top: 5px;
+      font-size: 1.2em;
     }
 
     .quote-box {
@@ -122,19 +127,19 @@
   </style>
 </head>
 <body class="dark">
-  <h1>🎵 Shivam's Music Space</h1>
-  <p>I Love Music and Coffee ☕</p>
+  <h1>Shivam's Music Space</h1>
+  <p>I Love Music and Coffee</p>
 
   <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
 
   <div class="controls">
-    <button onclick="generateQuote()">💡 Inspire Me</button>
-    <button onclick="togglePlay()">▶️ Play / ⏸️ Pause</button>
-    <button onclick="toggleTheme()">🌓 Toggle Theme</button><br/>
-    <label for="volume">🔊 Volume:</label>
+    <button onclick="generateQuote()">Inspire Me</button>
+    <button onclick="togglePlay()">Play / Pause</button>
+    <button onclick="toggleTheme()">Toggle Theme</button><br/>
+    <label for="volume">Volume:</label>
     <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01" value="0.5" />
     <br/>
-    <label for="trackSelector">🎧 Choose a Track:</label>
+    <label for="trackSelector">Choose a Track:</label>
     <select id="trackSelector">
       <option value="mortals-funk-remix.mp3">Mortals (Funk Remix)</option>
       <option value="on-and-on.mp3">On & On</option>
@@ -237,9 +242,7 @@
       const random = quotes[Math.floor(Math.random() * quotes.length)];
       quoteText.style.opacity = 0;
       setTimeout(() => {
-        quoteText.innerHTML = `
-          <span style="font-size: 1.5em; display: inline-block; margin-right: 10px;" aria-label="${random.text} emoji" role="img">${random.emoji}</span>
-          <span>${random.text}</span>`;
+        quoteText.innerHTML = `<span>${random.text}</span> <span>${random.emoji}</span>`;
         quoteText.style.opacity = 1;
       }, 200);
     }
