@@ -6,13 +6,15 @@
   <title>Shivam's Music Space</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
+  html, body {
   height: 100%;
   font-family: 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
   text-align: center;
   overflow: hidden;
   transition: color 0.5s;
+  line-height: 1.6; /* add spacing between lines */
   }
+
     
     body.dark {
       animation: bgCycle 25s infinite linear;
@@ -40,16 +42,17 @@
       font-size: 2.5em;
     }
 
-    .quote-box {
-      margin: 20px auto;
-      padding: 15px 20px;
-      max-width: 600px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      font-size: 1.2em;
-      font-style: italic;
-      color: inherit;
-    }
+  .quote-box {
+  margin: 30px auto;
+  padding: 20px;
+  max-width: 600px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-size: 1.4em;
+  font-style: italic;
+  color: inherit;
+  line-height: 1.8;
+  }
 
     body.light .quote-box {
       background: rgba(0,0,0,0.05);
@@ -233,7 +236,7 @@
 
   function generateQuote() {
   const random = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteText.textContent = `${random.emoji} ${random.text}`;
+  quoteText.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${random.emoji}</span> ${random.text}`;
   }
 
     function updateFooter(track) {
