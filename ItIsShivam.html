@@ -162,16 +162,26 @@
     const footerInfo = document.getElementById('footerInfo');
     let isPlaying = false;
 
-    const quotes = [
-      "Relax. Refresh. Recharge. ☕",
-      "Life is better with music and coffee. 🎶",
-      "Good vibes only. ✨",
-      "Breathe in peace, breathe out stress.",
-      "Let your soul catch up with your body.",
-      "Don't chase. Attract. 🌈",
-      "Every day is a fresh start.",
-      "You got this. Stay cool. 😎"
-    ];
+  const quotes = [
+  { text: "Relax. Refresh. Recharge.", emoji: "☕" },
+  { text: "Life is better with music and coffee.", emoji: "🎶" },
+  { text: "Good vibes only.", emoji: "✨" },
+  { text: "Breathe in peace, breathe out stress.", emoji: "🧘‍♂️" },
+  { text: "Let your soul catch up with your body.", emoji: "🕊️" },
+  { text: "Don't chase. Attract.", emoji: "🌈" },
+  { text: "Every day is a fresh start.", emoji: "🌞" },
+  { text: "You got this. Stay cool.", emoji: "😎" },
+  { text: "Push yourself, no one else will do it for you.", emoji: "🚀" },
+  { text: "Make today so awesome that yesterday gets jealous.", emoji: "🔥" },
+  { text: "Dream big. Work hard. Stay focused.", emoji: "🎯" },
+  { text: "Your only limit is your mind.", emoji: "🧠" },
+  { text: "Success is not for the lazy.", emoji: "🏆" },
+  { text: "The grind never stops.", emoji: "💪" },
+  { text: "Discipline equals freedom.", emoji: "🛡️" },
+  { text: "Mindset is everything.", emoji: "🧘‍♀️" },
+  { text: "Progress, not perfection.", emoji: "📈" },
+  { text: "Winners focus on winning.", emoji: "🥇" }
+];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
