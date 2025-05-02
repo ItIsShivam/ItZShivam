@@ -7,18 +7,16 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
-      height: 100%;
+      min-height: 100vh;
       font-family: 'Segoe UI', 'Segoe UI Emoji', sans-serif;
       text-align: center;
-      overflow: hidden;
-      transition: color 0.5s;
       line-height: 1.6;
-      min-height: 100vh; /* Ensure body takes full height */
+      overflow: hidden;
+      transition: background-color 1s linear, color 1s linear;
     }
 
     body.dark {
       animation: bgCycle 25s infinite linear;
-      color: black;
     }
 
     body.light {
@@ -40,13 +38,11 @@
     h1 {
       margin-top: 20px;
       font-size: 2.5em;
-      color: #ff5722;
     }
 
     p {
       margin-top: 5px;
       font-size: 1.2em;
-      color: #333;
     }
 
     .quote-box {
@@ -77,7 +73,7 @@
       color: white;
       border: none;
       border-radius: 5px;
-      font-size: 1.2em;
+      font-size: 1.1em;
       cursor: pointer;
       transition: background 0.3s;
     }
@@ -97,7 +93,7 @@
       height: 150px;
       margin-top: 20px;
       gap: 4px;
-      margin-bottom: 50px; /* Ensure equalizer doesn't get cut off */
+      margin-bottom: 60px;
     }
 
     .bar {
@@ -132,9 +128,9 @@
 </head>
 <body class="dark">
   <h1>Shivam's Music Space 🎶☕</h1>
-  <p>I Love Music and Coffee 🧑‍🎤☕</p>
+  <p>I Love Music and Coffee</p>
 
-  <div class="quote-box" id="quoteText">Click the button below for some inspiration! 💡</div>
+  <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
 
   <div class="controls">
     <button onclick="generateQuote()">💡 Inspire Me</button>
@@ -163,7 +159,7 @@
     Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
   </div>
 
-  <audio id="audio" src="mortals-funk-remix.mp3" preload="auto" loop></audio>
+  <audio id="audio" src="mortals-funk-remix.mp3" preload="auto"></audio>
 
   <script>
     const audio = document.getElementById('audio');
@@ -186,13 +182,7 @@
       { text: "Push yourself, no one else will do it for you.", emoji: "🚀" },
       { text: "Make today so awesome that yesterday gets jealous.", emoji: "🔥" },
       { text: "Dream big. Work hard. Stay focused.", emoji: "🎯" },
-      { text: "Your only limit is your mind.", emoji: "🧠" },
-      { text: "Success is not for the lazy.", emoji: "🏆" },
-      { text: "The grind never stops.", emoji: "💪" },
-      { text: "Discipline equals freedom.", emoji: "🛡️" },
-      { text: "Mindset is everything.", emoji: "🧘‍♀️" },
-      { text: "Progress, not perfection.", emoji: "📈" },
-      { text: "Winners focus on winning.", emoji: "🥇" }
+      { text: "Your only limit is your mind.", emoji: "🧠" }
     ];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -244,7 +234,7 @@
 
     function generateQuote() {
       const random = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteText.innerHTML = `"${random.text}" <span style="font-size: 1.5em;">${random.emoji}</span>`;
+      quoteText.innerHTML = `"${random.text}" <span>${random.emoji}</span>`;
     }
 
     function updateFooter(track) {
@@ -265,6 +255,16 @@
       if (isPlaying) {
         audio.play();
       }
+    });
+
+    audio.addEventListener('ended', () => {
+      const currentIndex = trackSelector.selectedIndex;
+      const nextIndex = (currentIndex + 1) % trackSelector.options.length;
+      trackSelector.selectedIndex = nextIndex;
+      const nextTrack = trackSelector.value;
+      audio.src = nextTrack;
+      updateFooter(nextTrack);
+      audio.play();
     });
 
     audio.volume = volumeSlider.value;
