@@ -230,10 +230,11 @@
       audio.volume = volumeSlider.value;
     });
 
-    function generateQuote() {
-      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteText.textContent = randomQuote;
-    }
+
+  function generateQuote() {
+  const random = quotes[Math.floor(Math.random() * quotes.length)];
+  quoteText.textContent = `${random.emoji} ${random.text}`;
+  }
 
     function updateFooter(track) {
       const info = {
