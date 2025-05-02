@@ -15,7 +15,7 @@
     }
 
     body.dark {
-      animation: bgCycle 15s infinite linear;
+      animation: bgCycle 25s infinite linear;
       color: black;
     }
 
@@ -24,16 +24,16 @@
       color: #222;
     }
 
-  @keyframes bgCycle {
-  0%   { background-color: #00ffff; color: #000; }  /* Aqua */
-  14%  { background-color: #ff6600; color: #fff; }  /* Neon Orange */
-  28%  { background-color: #00ff00; color: #000; }  /* Lime Green */
-  42%  { background-color: #0000ff; color: #fff; }  /* Pure Blue */
-  57%  { background-color: #ff0000; color: #fff; }  /* Bright Red */
-  71%  { background-color: #ffcc00; color: #000; }  /* Gold */
-  85%  { background-color: #008080; color: #fff; }  /* Teal */
-  100% { background-color: #00ffff; color: #000; }  /* Loop back to Aqua */
-  }
+    @keyframes bgCycle {
+      0%   { background-color: #00ffff; color: #000; }  /* Aqua */
+      14%  { background-color: #ff6600; color: #fff; }  /* Neon Orange */
+      28%  { background-color: #00ff00; color: #000; }  /* Lime Green */
+      42%  { background-color: #0000ff; color: #fff; }  /* Blue */
+      57%  { background-color: #ff0000; color: #fff; }  /* Red */
+      71%  { background-color: #ffcc00; color: #000; }  /* Gold */
+      85%  { background-color: #008080; color: #fff; }  /* Teal */
+      100% { background-color: #00ffff; color: #000; }  /* Loop */
+    }
 
     h1 {
       margin-top: 30px;
@@ -59,7 +59,7 @@
       margin: 20px 0;
     }
 
-    button {
+    button, select {
       padding: 10px 20px;
       margin: 10px 5px;
       background-color: #3E2723;
@@ -71,7 +71,7 @@
       transition: background 0.3s;
     }
 
-    button:hover {
+    button:hover, select:hover {
       background-color: #ff5722;
     }
 
@@ -122,31 +122,35 @@
   <h1>🎵 Shivam's Music Space</h1>
   <p>I Love Music and Coffee ☕</p>
 
-  <!-- Quote Display -->
   <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
 
-  <!-- Controls -->
   <div class="controls">
     <button onclick="generateQuote()">💡 Inspire Me</button>
     <button onclick="togglePlay()">▶️ Play / ⏸️ Pause</button>
     <button onclick="toggleTheme()">🌓 Toggle Theme</button><br/>
     <label for="volume">🔊 Volume:</label>
     <input type="range" id="volume" class="volume-slider" min="0" max="1" step="0.01" value="0.5" />
+    <br/>
+    <label for="trackSelector">🎧 Choose a Track:</label>
+    <select id="trackSelector">
+      <option value="mortals-funk-remix.mp3">Mortals (Funk Remix)</option>
+      <option value="on-and-on.mp3">On & On</option>
+      <option value="make-me-move.mp3">Make Me Move</option>
+      <option value="heroes-tonight.mp3">Heroes Tonight</option>
+      <option value="power.mp3">Power</option>
+    </select>
   </div>
 
-  <!-- Equalizer -->
   <div class="equalizer" id="equalizer">
     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
   </div>
 
-  <!-- Footer -->
-  <div class="footer">
+  <div class="footer" id="footerInfo">
     Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm |
     Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
   </div>
 
-  <!-- Music -->
   <audio id="audio" src="mortals-funk-remix.mp3" preload="auto" loop></audio>
 
   <script>
@@ -154,6 +158,8 @@
     const volumeSlider = document.getElementById('volume');
     const bars = document.querySelectorAll('.bar');
     const quoteText = document.getElementById('quoteText');
+    const trackSelector = document.getElementById('trackSelector');
+    const footerInfo = document.getElementById('footerInfo');
     let isPlaying = false;
 
     const quotes = [
@@ -172,10 +178,8 @@
     const source = audioCtx.createMediaElementSource(audio);
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 64;
-
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
 
@@ -185,7 +189,6 @@
       bars.forEach((bar, i) => {
         const scale = dataArray[i] / 3;
         bar.style.height = `${Math.max(scale, 5)}px`;
-
         if (!document.body.classList.contains('light')) {
           const color1 = `hsl(${(scale * 2) % 360}, 100%, 50%)`;
           const color2 = `hsl(${(scale * 2 + 60) % 360}, 100%, 50%)`;
@@ -221,6 +224,26 @@
       const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
       quoteText.textContent = randomQuote;
     }
+
+    function updateFooter(track) {
+      const info = {
+        "mortals-funk-remix.mp3": `Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm | Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>`,
+        "on-and-on.mp3": `Now Playing: <strong>"On & On"</strong> by Cartoon ft. Daniel Levi | Provided by <a href="https://ncs.io/OnAndOn" target="_blank">NCS</a>`,
+        "make-me-move.mp3": `Now Playing: <strong>"Make Me Move"</strong> by Culture Code ft. Karra | Provided by <a href="https://ncs.io/MakeMeMove" target="_blank">NCS</a>`,
+        "heroes-tonight.mp3": `Now Playing: <strong>"Heroes Tonight"</strong> by Janji ft. Johnning | Provided by <a href="https://ncs.io/HeroesTonight" target="_blank">NCS</a>`,
+        "power.mp3": `Now Playing: <strong>"Power"</strong> by Unknown Brain ft. High Maintenance | Provided by <a href="https://ncs.io/Power" target="_blank">NCS</a>`
+      };
+      footerInfo.innerHTML = info[track] || "Now Playing";
+    }
+
+    trackSelector.addEventListener('change', () => {
+      const selectedTrack = trackSelector.value;
+      audio.src = selectedTrack;
+      updateFooter(selectedTrack);
+      if (isPlaying) {
+        audio.play();
+      }
+    });
 
     audio.volume = volumeSlider.value;
   </script>
