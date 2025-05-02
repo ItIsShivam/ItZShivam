@@ -6,16 +6,15 @@
   <title>Shivam's Music Space</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-  height: 100%;
-  font-family: 'Segoe UI', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-  text-align: center;
-  overflow: hidden;
-  transition: color 0.5s;
-  line-height: 1.6; /* add spacing between lines */
-  }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI Emoji', 'Segoe UI', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+      text-align: center;
+      overflow: hidden;
+      transition: color 0.5s;
+      line-height: 1.6;
+    }
 
-    
     body.dark {
       animation: bgCycle 25s infinite linear;
       color: black;
@@ -27,14 +26,14 @@
     }
 
     @keyframes bgCycle {
-      0%   { background-color: #00ffff; color: #000; }  /* Aqua */
-      14%  { background-color: #ff6600; color: #fff; }  /* Neon Orange */
-      28%  { background-color: #00ff00; color: #000; }  /* Lime Green */
-      42%  { background-color: #0000ff; color: #fff; }  /* Blue */
-      57%  { background-color: #ff0000; color: #fff; }  /* Red */
-      71%  { background-color: #ffcc00; color: #000; }  /* Gold */
-      85%  { background-color: #008080; color: #fff; }  /* Teal */
-      100% { background-color: #00ffff; color: #000; }  /* Loop */
+      0%   { background-color: #00ffff; color: #000; }
+      14%  { background-color: #ff6600; color: #fff; }
+      28%  { background-color: #00ff00; color: #000; }
+      42%  { background-color: #0000ff; color: #fff; }
+      57%  { background-color: #ff0000; color: #fff; }
+      71%  { background-color: #ffcc00; color: #000; }
+      85%  { background-color: #008080; color: #fff; }
+      100% { background-color: #00ffff; color: #000; }
     }
 
     h1 {
@@ -42,17 +41,17 @@
       font-size: 2.5em;
     }
 
-  .quote-box {
-  margin: 30px auto;
-  padding: 20px;
-  max-width: 600px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 10px;
-  font-size: 1.4em;
-  font-style: italic;
-  color: inherit;
-  line-height: 1.8;
-  }
+    .quote-box {
+      margin: 30px auto;
+      padding: 20px;
+      max-width: 600px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      font-size: 1.5em;
+      font-style: italic;
+      color: inherit;
+      line-height: 1.8;
+    }
 
     body.light .quote-box {
       background: rgba(0,0,0,0.05);
@@ -165,26 +164,26 @@
     const footerInfo = document.getElementById('footerInfo');
     let isPlaying = false;
 
-  const quotes = [
-  { text: "Relax. Refresh. Recharge.", emoji: "☕" },
-  { text: "Life is better with music and coffee.", emoji: "🎶" },
-  { text: "Good vibes only.", emoji: "✨" },
-  { text: "Breathe in peace, breathe out stress.", emoji: "🧘‍♂️" },
-  { text: "Let your soul catch up with your body.", emoji: "🕊️" },
-  { text: "Don't chase. Attract.", emoji: "🌈" },
-  { text: "Every day is a fresh start.", emoji: "🌞" },
-  { text: "You got this. Stay cool.", emoji: "😎" },
-  { text: "Push yourself, no one else will do it for you.", emoji: "🚀" },
-  { text: "Make today so awesome that yesterday gets jealous.", emoji: "🔥" },
-  { text: "Dream big. Work hard. Stay focused.", emoji: "🎯" },
-  { text: "Your only limit is your mind.", emoji: "🧠" },
-  { text: "Success is not for the lazy.", emoji: "🏆" },
-  { text: "The grind never stops.", emoji: "💪" },
-  { text: "Discipline equals freedom.", emoji: "🛡️" },
-  { text: "Mindset is everything.", emoji: "🧘‍♀️" },
-  { text: "Progress, not perfection.", emoji: "📈" },
-  { text: "Winners focus on winning.", emoji: "🥇" }
-];
+    const quotes = [
+      { text: "Relax. Refresh. Recharge.", emoji: "☕" },
+      { text: "Life is better with music and coffee.", emoji: "🎶" },
+      { text: "Good vibes only.", emoji: "✨" },
+      { text: "Breathe in peace, breathe out stress.", emoji: "🧘‍♂️" },
+      { text: "Let your soul catch up with your body.", emoji: "🕊️" },
+      { text: "Don't chase. Attract.", emoji: "🌈" },
+      { text: "Every day is a fresh start.", emoji: "🌞" },
+      { text: "You got this. Stay cool.", emoji: "😎" },
+      { text: "Push yourself, no one else will do it for you.", emoji: "🚀" },
+      { text: "Make today so awesome that yesterday gets jealous.", emoji: "🔥" },
+      { text: "Dream big. Work hard. Stay focused.", emoji: "🎯" },
+      { text: "Your only limit is your mind.", emoji: "🧠" },
+      { text: "Success is not for the lazy.", emoji: "🏆" },
+      { text: "The grind never stops.", emoji: "💪" },
+      { text: "Discipline equals freedom.", emoji: "🛡️" },
+      { text: "Mindset is everything.", emoji: "🧘‍♀️" },
+      { text: "Progress, not perfection.", emoji: "📈" },
+      { text: "Winners focus on winning.", emoji: "🥇" }
+    ];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const audioCtx = new AudioContext();
@@ -233,11 +232,10 @@
       audio.volume = volumeSlider.value;
     });
 
-
-  function generateQuote() {
-  const random = quotes[Math.floor(Math.random() * quotes.length)];
-  quoteText.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${random.emoji}</span> ${random.text}`;
-  }
+    function generateQuote() {
+      const random = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteText.innerHTML = `<span style="font-size: 1.5em; margin-right: 10px;">${random.emoji}</span> ${random.text}`;
+    }
 
     function updateFooter(track) {
       const info = {
