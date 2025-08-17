@@ -14,16 +14,13 @@
       overflow: hidden;
       transition: background-color 1s linear, color 1s linear;
     }
-
     body.dark {
       animation: bgCycle 25s infinite linear;
     }
-
     body.light {
       background: linear-gradient(to top, #ffffff, #eeeeee);
       color: #222;
     }
-
     @keyframes bgCycle {
       0%   { background-color: #00ffff; color: #000; }
       14%  { background-color: #ff6600; color: #fff; }
@@ -34,17 +31,14 @@
       85%  { background-color: #008080; color: #fff; }
       100% { background-color: #00ffff; color: #000; }
     }
-
     h1 {
       margin-top: 20px;
       font-size: 2.5em;
     }
-
     p {
       margin-top: 5px;
       font-size: 1.2em;
     }
-
     .quote-box {
       margin: 30px auto;
       padding: 20px;
@@ -57,15 +51,12 @@
       line-height: 1.8;
       transition: opacity 0.5s ease-in-out;
     }
-
     body.light .quote-box {
       background: rgba(0,0,0,0.05);
     }
-
     .controls {
       margin: 20px 0;
     }
-
     button, select {
       padding: 10px 20px;
       margin: 10px 5px;
@@ -77,15 +68,12 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     button:hover, select:hover {
       background-color: #ff5722;
     }
-
     .volume-slider {
       width: 200px;
     }
-
     .equalizer {
       display: flex;
       justify-content: center;
@@ -95,18 +83,15 @@
       gap: 4px;
       margin-bottom: 60px;
     }
-
     .bar {
       width: 12px;
       height: 20px;
       border-radius: 3px;
       transition: height 0.1s ease-in-out, background 0.5s;
     }
-
     body.light .bar {
       background: black;
     }
-
     .footer {
       position: absolute;
       bottom: 0;
@@ -116,12 +101,10 @@
       color: white;
       font-size: 0.9em;
     }
-
     body.light .footer {
       background: #ccc;
       color: #111;
     }
-
     a { color: #ffcc80; }
     body.light a { color: #333; }
   </style>
@@ -129,9 +112,7 @@
 <body class="dark">
   <h1>Shivam's Music Space 🎶☕</h1>
   <p>I Love Music and Coffee</p>
-
   <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
-
   <div class="controls">
     <button onclick="generateQuote()">💡 Inspire Me</button>
     <button onclick="togglePlay()">▶️ Play / ⏸️ Pause</button>
@@ -146,21 +127,22 @@
       <option value="make-me-move.mp3">Make Me Move</option>
       <option value="heroes-tonight.mp3">Heroes Tonight</option>
       <option value="power.mp3">Power</option>
+      <option value="only-human.mp3">Only Human</option>
+      <option value="want-your-body.mp3">Want Your Body</option>
+      <option value="did-it-mean-forever.mp3">Did It Mean Forever</option>
+      <option value="her-body.mp3">Her Body</option>
+      <option value="all-i-need.mp3">All I Need</option>
     </select>
   </div>
-
   <div class="equalizer" id="equalizer">
     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
     <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
   </div>
-
   <div class="footer" id="footerInfo">
     Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm |
     Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
   </div>
-
   <audio id="audio" src="mortals-funk-remix.mp3" preload="auto"></audio>
-
   <script>
     const audio = document.getElementById('audio');
     const volumeSlider = document.getElementById('volume');
@@ -169,20 +151,27 @@
     const trackSelector = document.getElementById('trackSelector');
     const footerInfo = document.getElementById('footerInfo');
     let isPlaying = false;
-
     const quotes = [
-      { text: "Relax. Refresh. Recharge.", emoji: "☕" },
-      { text: "Life is better with music and coffee.", emoji: "🎶" },
-      { text: "Good vibes only.", emoji: "✨" },
-      { text: "Breathe in peace, breathe out stress.", emoji: "🧘‍♂️" },
-      { text: "Let your soul catch up with your body.", emoji: "🕊️" },
-      { text: "Don't chase. Attract.", emoji: "🌈" },
-      { text: "Every day is a fresh start.", emoji: "🌞" },
-      { text: "You got this. Stay cool.", emoji: "😎" },
-      { text: "Push yourself, no one else will do it for you.", emoji: "🚀" },
-      { text: "Make today so awesome that yesterday gets jealous.", emoji: "🔥" },
-      { text: "Dream big. Work hard. Stay focused.", emoji: "🎯" },
-      { text: "Your only limit is your mind.", emoji: "🧠" }
+      { text: "Sip, listen, conquer your dreams. ☕🎶", emoji: "" },
+      { text: "Strong coffee, stronger you. Keep moving forward! 💪☕", emoji: "" },
+      { text: "Music fuels the soul—rise and shine! 🌅🎧", emoji: "" },
+      { text: "Start each day like it’s a new adventure. 🚀✨", emoji: "" },
+      { text: "Great things take time. Enjoy the process. ⏳🌻", emoji: "" },
+      { text: "You are unstoppable. Own your vibe! 🔥😎", emoji: "" },
+      { text: "Let your passion light up the world. 💡🌍", emoji: "" },
+      { text: "Face challenges with a smile and a song! 😄🎵", emoji: "" },
+      { text: "Your best days are ahead—keep pushing. ⛰️🌈", emoji: "" },
+      { text: "Find peace in the rhythm of life. 🧘‍♂️🥁", emoji: "" },
+      { text: "Turn your dreams into plans. Then make them reality. ✨📅", emoji: "" },
+      { text: "You’re not alone on this journey. Keep going. 🤝🌠", emoji: "" },
+      { text: "Good vibes, good coffee, good music—repeat! 😌☕🎶", emoji: "" },
+      { text: "Rise up and show the world who you are! 🚀🌟", emoji: "" },
+      { text: "Failures are stepping stones to greatness. 🪨💎", emoji: "" },
+      { text: "Sing, dance, love, laugh—live fully! 🎤💃❤️😂", emoji: "" },
+      { text: "Every challenge is a chance to grow. 🌱🔥", emoji: "" },
+      { text: "Refuel your energy, replay your strength. 🚴🔋", emoji: "" },
+      { text: "Be bold, be brave, be brilliant. 🦁💡", emoji: "" },
+      { text: "Enjoy the moment and make magic happen. ✨🎩", emoji: "" }
     ];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -194,13 +183,12 @@
     const dataArray = new Uint8Array(bufferLength);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
-
     function animateEqualizer() {
       requestAnimationFrame(animateEqualizer);
       analyser.getByteFrequencyData(dataArray);
       bars.forEach((bar, i) => {
         const scale = dataArray[i] / 3;
-        bar.style.height = `${Math.max(scale, 5)}px`;
+        bar.style.height = Math.max(scale, 5) + "px";
         if (!document.body.classList.contains('light')) {
           const color1 = `hsl(${(scale * 2) % 360}, 100%, 50%)`;
           const color2 = `hsl(${(scale * 2 + 60) % 360}, 100%, 50%)`;
@@ -210,7 +198,6 @@
         }
       });
     }
-
     function togglePlay() {
       if (!isPlaying) {
         audioCtx.resume();
@@ -222,32 +209,32 @@
         isPlaying = false;
       }
     }
-
     function toggleTheme() {
       document.body.classList.toggle('light');
       document.body.classList.toggle('dark');
     }
-
     volumeSlider.addEventListener('input', () => {
       audio.volume = volumeSlider.value;
     });
-
     function generateQuote() {
       const random = quotes[Math.floor(Math.random() * quotes.length)];
-      quoteText.innerHTML = `"${random.text}" <span>${random.emoji}</span>`;
+      quoteText.innerHTML = random.text;
     }
-
     function updateFooter(track) {
       const info = {
-        "mortals-funk-remix.mp3": `Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm | Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>`,
-        "on-and-on.mp3": `Now Playing: <strong>"On & On"</strong> by Cartoon ft. Daniel Levi | Provided by <a href="https://ncs.io/OnAndOn" target="_blank">NCS</a>`,
-        "make-me-move.mp3": `Now Playing: <strong>"Make Me Move"</strong> by Culture Code ft. Karra | Provided by <a href="https://ncs.io/MakeMeMove" target="_blank">NCS</a>`,
-        "heroes-tonight.mp3": `Now Playing: <strong>"Heroes Tonight"</strong> by Janji ft. Johnning | Provided by <a href="https://ncs.io/HeroesTonight" target="_blank">NCS</a>`,
-        "power.mp3": `Now Playing: <strong>"Power"</strong> by Unknown Brain ft. High Maintenance | Provided by <a href="https://ncs.io/Power" target="_blank">NCS</a>`
+        "mortals-funk-remix.mp3": 'Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm | Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>',
+        "on-and-on.mp3": 'Now Playing: <strong>"On & On"</strong> by Cartoon ft. Daniel Levi | Provided by <a href="https://ncs.io/OnAndOn" target="_blank">NCS</a>',
+        "make-me-move.mp3": 'Now Playing: <strong>"Make Me Move"</strong> by Culture Code ft. Karra | Provided by <a href="https://ncs.io/MakeMeMove" target="_blank">NCS</a>',
+        "heroes-tonight.mp3": 'Now Playing: <strong>"Heroes Tonight"</strong> by Janji ft. Johnning | Provided by <a href="https://ncs.io/HeroesTonight" target="_blank">NCS</a>',
+        "power.mp3": 'Now Playing: <strong>"Power"</strong> by Unknown Brain ft. High Maintenance | Provided by <a href="https://ncs.io/Power" target="_blank">NCS</a>',
+        "only-human.mp3": 'Now Playing: <strong>"Only Human"</strong> by Koven | Provided by <a href="https://ncs.io/OnlyHuman" target="_blank">NCS</a>',
+        "want-your-body.mp3": 'Now Playing: <strong>"Want Your Body"</strong> by Cadmium x Jaxi | Provided by <a href="https://ncs.io/WantYourBody" target="_blank">NCS</a>',
+        "did-it-mean-forever.mp3": 'Now Playing: <strong>"Did It Mean Forever"</strong> by Disfigure | Provided by <a href="https://ncs.io/DidItMeanForever" target="_blank">NCS</a>',
+        "her-body.mp3": 'Now Playing: <strong>"Her Body"</strong> by RetroVision | Provided by <a href="https://ncs.io/HerBody" target="_blank">NCS</a>',
+        "all-i-need.mp3": 'Now Playing: <strong>"All I Need"</strong> by Unknown Brain ft. Bri Tolani | Provided by <a href="https://ncs.io/AllINeed" target="_blank">NCS</a>'
       };
       footerInfo.innerHTML = info[track] || "Now Playing";
     }
-
     trackSelector.addEventListener('change', () => {
       const selectedTrack = trackSelector.value;
       audio.src = selectedTrack;
@@ -256,7 +243,6 @@
         audio.play();
       }
     });
-
     audio.addEventListener('ended', () => {
       const currentIndex = trackSelector.selectedIndex;
       const nextIndex = (currentIndex + 1) % trackSelector.options.length;
@@ -266,7 +252,6 @@
       updateFooter(nextTrack);
       audio.play();
     });
-
     audio.volume = volumeSlider.value;
   </script>
 </body>
