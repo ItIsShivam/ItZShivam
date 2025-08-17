@@ -111,7 +111,7 @@
 </head>
 <body class="dark">
   <h1>Shivam's Music Space 🎶☕</h1>
-  <p>I Love Music and Coffee</p>
+  <p>I Love Music and Coffee<br/><a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Visit my website</a></p>
   <div class="quote-box" id="quoteText">Click the button below for some inspiration!</div>
   <div class="controls">
     <button onclick="generateQuote()">💡 Inspire Me</button>
@@ -130,7 +130,7 @@
       <option value="only-human.mp3">Only Human</option>
       <option value="want-your-body.mp3">Want Your Body</option>
       <option value="did-it-mean-forever.mp3">Did It Mean Forever</option>
-      <option value="her-body.mp3">Her Body</option>
+      <option value="digital-death.mp3">Digital Death</option>
       <option value="all-i-need.mp3">All I Need</option>
     </select>
   </div>
@@ -140,7 +140,8 @@
   </div>
   <div class="footer" id="footerInfo">
     Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm |
-    Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>
+    Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a> |
+    Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>
   </div>
   <audio id="audio" src="mortals-funk-remix.mp3" preload="auto"></audio>
   <script>
@@ -152,26 +153,26 @@
     const footerInfo = document.getElementById('footerInfo');
     let isPlaying = false;
     const quotes = [
-      { text: "Sip, listen, conquer your dreams. ☕🎶", emoji: "" },
-      { text: "Strong coffee, stronger you. Keep moving forward! 💪☕", emoji: "" },
-      { text: "Music fuels the soul—rise and shine! 🌅🎧", emoji: "" },
-      { text: "Start each day like it’s a new adventure. 🚀✨", emoji: "" },
-      { text: "Great things take time. Enjoy the process. ⏳🌻", emoji: "" },
-      { text: "You are unstoppable. Own your vibe! 🔥😎", emoji: "" },
-      { text: "Let your passion light up the world. 💡🌍", emoji: "" },
-      { text: "Face challenges with a smile and a song! 😄🎵", emoji: "" },
-      { text: "Your best days are ahead—keep pushing. ⛰️🌈", emoji: "" },
-      { text: "Find peace in the rhythm of life. 🧘‍♂️🥁", emoji: "" },
-      { text: "Turn your dreams into plans. Then make them reality. ✨📅", emoji: "" },
-      { text: "You’re not alone on this journey. Keep going. 🤝🌠", emoji: "" },
-      { text: "Good vibes, good coffee, good music—repeat! 😌☕🎶", emoji: "" },
-      { text: "Rise up and show the world who you are! 🚀🌟", emoji: "" },
-      { text: "Failures are stepping stones to greatness. 🪨💎", emoji: "" },
-      { text: "Sing, dance, love, laugh—live fully! 🎤💃❤️😂", emoji: "" },
-      { text: "Every challenge is a chance to grow. 🌱🔥", emoji: "" },
-      { text: "Refuel your energy, replay your strength. 🚴🔋", emoji: "" },
-      { text: "Be bold, be brave, be brilliant. 🦁💡", emoji: "" },
-      { text: "Enjoy the moment and make magic happen. ✨🎩", emoji: "" }
+      { text: "Sip, listen, conquer your dreams. ☕🎶" },
+      { text: "Strong coffee, stronger you. Keep moving forward! 💪☕" },
+      { text: "Music fuels the soul—rise and shine! 🌅🎧" },
+      { text: "Start each day like it’s a new adventure. 🚀✨" },
+      { text: "Great things take time. Enjoy the process. ⏳🌻" },
+      { text: "You are unstoppable. Own your vibe! 🔥😎" },
+      { text: "Let your passion light up the world. 💡🌍" },
+      { text: "Face challenges with a smile and a song! 😄🎵" },
+      { text: "Your best days are ahead—keep pushing. ⛰️🌈" },
+      { text: "Find peace in the rhythm of life. 🧘‍♂️🥁" },
+      { text: "Turn your dreams into plans. Then make them reality. ✨📅" },
+      { text: "You’re not alone on this journey. Keep going. 🤝🌠" },
+      { text: "Good vibes, good coffee, good music—repeat! 😌☕🎶" },
+      { text: "Rise up and show the world who you are! 🚀🌟" },
+      { text: "Failures are stepping stones to greatness. 🪨💎" },
+      { text: "Sing, dance, love, laugh—live fully! 🎤💃❤️😂" },
+      { text: "Every challenge is a chance to grow. 🌱🔥" },
+      { text: "Refuel your energy, replay your strength. 🚴🔋" },
+      { text: "Be bold, be brave, be brilliant. 🦁💡" },
+      { text: "Enjoy the moment and make magic happen. ✨🎩" }
     ];
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -183,6 +184,7 @@
     const dataArray = new Uint8Array(bufferLength);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
+
     function animateEqualizer() {
       requestAnimationFrame(animateEqualizer);
       analyser.getByteFrequencyData(dataArray);
@@ -222,16 +224,16 @@
     }
     function updateFooter(track) {
       const info = {
-        "mortals-funk-remix.mp3": 'Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm | Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a>',
-        "on-and-on.mp3": 'Now Playing: <strong>"On & On"</strong> by Cartoon ft. Daniel Levi | Provided by <a href="https://ncs.io/OnAndOn" target="_blank">NCS</a>',
-        "make-me-move.mp3": 'Now Playing: <strong>"Make Me Move"</strong> by Culture Code ft. Karra | Provided by <a href="https://ncs.io/MakeMeMove" target="_blank">NCS</a>',
-        "heroes-tonight.mp3": 'Now Playing: <strong>"Heroes Tonight"</strong> by Janji ft. Johnning | Provided by <a href="https://ncs.io/HeroesTonight" target="_blank">NCS</a>',
-        "power.mp3": 'Now Playing: <strong>"Power"</strong> by Unknown Brain ft. High Maintenance | Provided by <a href="https://ncs.io/Power" target="_blank">NCS</a>',
-        "only-human.mp3": 'Now Playing: <strong>"Only Human"</strong> by Koven | Provided by <a href="https://ncs.io/OnlyHuman" target="_blank">NCS</a>',
-        "want-your-body.mp3": 'Now Playing: <strong>"Want Your Body"</strong> by Cadmium x Jaxi | Provided by <a href="https://ncs.io/WantYourBody" target="_blank">NCS</a>',
-        "did-it-mean-forever.mp3": 'Now Playing: <strong>"Did It Mean Forever"</strong> by Disfigure | Provided by <a href="https://ncs.io/DidItMeanForever" target="_blank">NCS</a>',
-        "her-body.mp3": 'Now Playing: <strong>"Her Body"</strong> by RetroVision | Provided by <a href="https://ncs.io/HerBody" target="_blank">NCS</a>',
-        "all-i-need.mp3": 'Now Playing: <strong>"All I Need"</strong> by Unknown Brain ft. Bri Tolani | Provided by <a href="https://ncs.io/AllINeed" target="_blank">NCS</a>'
+        "mortals-funk-remix.mp3": 'Now Playing: <strong>"Mortals (Funk Remix)"</strong> by Warriyo ft. Laura Brehm | Provided by <a href="https://ncs.io/MortalsFunkRemix" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "on-and-on.mp3": 'Now Playing: <strong>"On & On"</strong> by Cartoon ft. Daniel Levi | Provided by <a href="https://ncs.io/OnAndOn" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "make-me-move.mp3": 'Now Playing: <strong>"Make Me Move"</strong> by Culture Code ft. Karra | Provided by <a href="https://ncs.io/MakeMeMove" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "heroes-tonight.mp3": 'Now Playing: <strong>"Heroes Tonight"</strong> by Janji ft. Johnning | Provided by <a href="https://ncs.io/HeroesTonight" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "power.mp3": 'Now Playing: <strong>"Power"</strong> by Unknown Brain ft. High Maintenance | Provided by <a href="https://ncs.io/Power" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "only-human.mp3": 'Now Playing: <strong>"Only Human"</strong> by Koven | Provided by <a href="https://ncs.io/OnlyHuman" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "want-your-body.mp3": 'Now Playing: <strong>"Want Your Body"</strong> by Cadmium x Jex, Timmy Commerford | Provided by <a href="https://ncs.io/WantYourBody" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "did-it-mean-forever.mp3": 'Now Playing: <strong>"Did It Mean Forever"</strong> by Disfigure | Provided by <a href="https://ncs.io/DidItMeanForever" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "digital-death.mp3": 'Now Playing: <strong>"Digital Death"</strong> by Rob Gasser | Provided by <a href="https://ncs.io/DigitalDeath" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>',
+        "all-i-need.mp3": 'Now Playing: <strong>"All I Need"</strong> by Unknown Brain ft. Bri Tolani | Provided by <a href="https://ncs.io/AllINeed" target="_blank">NCS</a> | Site by <a href="https://itisshivam.github.io/ItZShivam/ItIsShivam.html" target="_blank">Shivam</a>'
       };
       footerInfo.innerHTML = info[track] || "Now Playing";
     }
