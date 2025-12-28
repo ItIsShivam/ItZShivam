@@ -1,0 +1,24 @@
+/* 1. Create a main container that holds everything */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Forces the container to fill the screen exactly */
+  justify-content: space-between; /* Pushes content to edges */
+  overflow: hidden; /* Prevents whole-page scrolling */
+}
+
+/* 2. Constrain the Quote Box */
+.quote-display-area {
+  flex-grow: 1; /* Allows this area to take up all empty space */
+  display: flex;
+  align-items: center; /* Centers text vertically */
+  justify-content: center;
+  overflow-y: auto; /* Adds a scrollbar ONLY to the text if it's too long */
+  padding: 20px;
+}
+
+/* 3. Stabilize the Button */
+.inspire-me-btn {
+  flex-shrink: 0; /* Prevents the button from being squashed */
+  margin-bottom: 20px;
+}
