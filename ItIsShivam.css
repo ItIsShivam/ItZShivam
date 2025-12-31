@@ -1,9 +1,11 @@
+/* ===== BASIC RESET ===== */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
   font-family: system-ui, -apple-system, sans-serif;
   transition: background 0.8s ease, color 0.4s ease;
   overflow-x: hidden;
@@ -17,7 +19,7 @@ body.light {
   color: #222;
 }
 
-/* Calm animated background */
+/* ===== ANIMATED BACKGROUND ===== */
 body.animated-bg {
   background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
   background-size: 300% 300%;
@@ -30,6 +32,7 @@ body.animated-bg {
   100% { background-position: 0% 50%; }
 }
 
+/* ===== MAIN CONTAINER ===== */
 .main-container {
   max-width: 900px;
   margin: auto;
@@ -43,6 +46,7 @@ header {
   text-align: center;
 }
 
+/* ===== QUOTE BOX ===== */
 .quote-box {
   padding: 22px;
   border-radius: 16px;
@@ -56,6 +60,7 @@ header {
   transition: opacity 0.3s ease, backdrop-filter 0.5s ease;
 }
 
+/* ===== CONTROLS ===== */
 .controls {
   display: flex;
   flex-direction: column;
@@ -71,7 +76,8 @@ header {
   align-items: center;
 }
 
-button, select {
+/* ===== BUTTONS ===== */
+button {
   padding: 11px 16px;
   border-radius: 14px;
   border: none;
@@ -91,10 +97,12 @@ button:active {
   transform: scale(0.96);
 }
 
+/* ===== RANGE SLIDERS ===== */
 input[type="range"] {
   width: 100%;
 }
 
+/* ===== PROGRESS ROW ===== */
 .progress-row {
   display: flex;
   align-items: center;
@@ -107,6 +115,7 @@ input[type="range"] {
   font-size: 0.9em;
 }
 
+/* ===== CANVAS VISUALIZER ===== */
 canvas {
   width: 100%;
   height: 150px;
@@ -115,13 +124,14 @@ canvas {
   transition: height 0.6s ease;
 }
 
+/* ===== FOOTER ===== */
 footer {
   text-align: center;
   font-size: 0.85em;
   opacity: 0.75;
 }
 
-/* AUTOMATIC AMBIENT MODE */
+/* ===== AUTOMATIC AMBIENT MODE ===== */
 body.ambient .controls {
   opacity: 0;
   transform: translateY(20px);
@@ -135,4 +145,75 @@ body.ambient .quote-box {
 
 body.ambient canvas {
   height: 260px;
+}
+
+/* ===== SELECT IMPROVEMENTS ===== */
+select {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, #4b4b4b, #2c2c2c);
+  color: #fff;
+  font-size: 1em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.3s;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Dropdown arrow */
+select::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%) rotate(45deg);
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+  animation: floatArrow 2s ease-in-out infinite;
+}
+
+/* Stop floating on focus/open */
+select:focus::after {
+  animation: none;
+  transform: translateY(-50%) rotate(-135deg);
+}
+
+/* Light mode for select */
+body.light select {
+  background: linear-gradient(135deg, #fff, #eee);
+  color: #222;
+  border: 1px solid rgba(0,0,0,0.2);
+}
+
+body.light select::after {
+  border-color: #222;
+}
+
+/* Floating animation keyframes */
+@keyframes floatArrow {
+  0%, 100% { transform: translateY(-50%) rotate(45deg); }
+  50% { transform: translateY(-48%) rotate(45deg); }
+}
+
+/* Hover glow */
+select:hover {
+  background: linear-gradient(135deg, #5c5c5c, #3a3a3a);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+}
+
+body.light select:hover {
+  background: linear-gradient(135deg, #eee, #fff);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Active select */
+select:active {
+  transform: scale(0.97);
 }
