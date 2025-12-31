@@ -1,24 +1,122 @@
-/* 1. Create a main container that holds everything */
-.main-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Forces the container to fill the screen exactly */
-  justify-content: space-between; /* Pushes content to edges */
-  overflow: hidden; /* Prevents whole-page scrolling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* 2. Constrain the Quote Box */
-.quote-display-area {
-  flex-grow: 1; /* Allows this area to take up all empty space */
+html, body {
+  height: 100%;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+body.dark {
+  background: radial-gradient(circle at top, #1e1e2f, #0d0d15);
+  color: #f5f5f5;
+}
+
+body.light {
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  color: #222;
+}
+
+.main-container {
+  height: 100vh;
   display: flex;
-  align-items: center; /* Centers text vertically */
-  justify-content: center;
-  overflow-y: auto; /* Adds a scrollbar ONLY to the text if it's too long */
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px;
 }
 
-/* 3. Stabilize the Button */
-.inspire-me-btn {
-  flex-shrink: 0; /* Prevents the button from being squashed */
+/* Header */
+header h1 {
+  font-size: 2.4rem;
+  margin-bottom: 6px;
+}
+
+header p {
+  opacity: 0.8;
+}
+
+/* Quote */
+.quote-display-area {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.quote-box {
+  max-width: 650px;
+  padding: 30px;
+  font-size: 1.5rem;
+  line-height: 1.7;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.08);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+body.light .quote-box {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Controls */
+.controls {
+  text-align: center;
   margin-bottom: 20px;
+}
+
+button, select {
+  padding: 12px 20px;
+  margin: 6px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background: #ff6a00;
+  color: white;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+button:hover, select:hover {
+  transform: translateY(-2px);
+  background: #ff8c42;
+}
+
+.sliders {
+  margin-top: 10px;
+}
+
+input[type="range"] {
+  width: 220px;
+}
+
+/* Equalizer */
+.equalizer {
+  display: flex;
+  gap: 6px;
+  height: 120px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+}
+
+.bar {
+  width: 12px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(to top, #ff6a00, #ffd000);
+  transition: height 0.1s ease;
+}
+
+body.light .bar {
+  background: #222;
+}
+
+/* Footer */
+footer {
+  font-size: 0.85rem;
+  opacity: 0.75;
 }
