@@ -7,7 +7,6 @@
 html, body {
   height: 100%;
   font-family: "Segoe UI", system-ui, sans-serif;
-  transition: background 0.6s ease, color 0.6s ease;
 }
 
 body.dark {
@@ -16,32 +15,33 @@ body.dark {
 }
 
 body.light {
-  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  background: linear-gradient(to bottom, #ffffff, #f1f1f1);
   color: #222;
 }
 
 .main-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 16px;
+  gap: 16px;
 }
 
-/* Header */
+header {
+  text-align: center;
+}
+
 header h1 {
-  font-size: 2.4rem;
-  margin-bottom: 6px;
+  font-size: 2rem;
 }
 
 header p {
   opacity: 0.8;
 }
 
-/* Quote */
 .quote-display-area {
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,13 +49,13 @@ header p {
 }
 
 .quote-box {
-  max-width: 650px;
-  padding: 30px;
-  font-size: 1.5rem;
-  line-height: 1.7;
+  max-width: 680px;
+  padding: 24px;
   border-radius: 14px;
-  backdrop-filter: blur(12px);
   background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  font-size: 1.4rem;
+  text-align: center;
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
@@ -63,60 +63,73 @@ body.light .quote-box {
   background: rgba(0,0,0,0.05);
 }
 
-/* Controls */
 .controls {
-  text-align: center;
-  margin-bottom: 20px;
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-button, select {
-  padding: 12px 20px;
-  margin: 6px;
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+button, select, input[type="range"] {
+  padding: 10px 14px;
   font-size: 1rem;
   border-radius: 8px;
   border: none;
-  cursor: pointer;
+}
+
+button, select {
   background: #ff6a00;
-  color: white;
-  transition: transform 0.2s ease, background 0.3s ease;
-}
-
-button:hover, select:hover {
-  transform: translateY(-2px);
-  background: #ff8c42;
-}
-
-.sliders {
-  margin-top: 10px;
+  color: #fff;
 }
 
 input[type="range"] {
-  width: 220px;
+  width: 180px;
 }
 
-/* Equalizer */
 .equalizer {
   display: flex;
   gap: 6px;
-  height: 120px;
+  height: 100px;
   align-items: flex-end;
-  margin-bottom: 15px;
 }
 
 .bar {
-  width: 12px;
+  width: 10px;
   height: 20px;
   border-radius: 4px;
   background: linear-gradient(to top, #ff6a00, #ffd000);
-  transition: height 0.1s ease;
 }
 
 body.light .bar {
   background: #222;
 }
 
-/* Footer */
 footer {
   font-size: 0.85rem;
-  opacity: 0.75;
+  opacity: 0.8;
+  text-align: center;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  header h1 {
+    font-size: 2.5rem;
+  }
+
+  .quote-box {
+    font-size: 1.6rem;
+  }
+
+  input[type="range"] {
+    width: 240px;
+  }
 }
