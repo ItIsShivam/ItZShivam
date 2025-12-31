@@ -2,45 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shivam Music Space</title>
-
-  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="ItIsShivam.css">
 </head>
 
 <body class="dark">
+
   <div class="main-container">
 
     <header>
-      <h1>Shivam Music Space</h1>
-      <p>Focus. Flow. Music.</p>
+      <h1>Shivam's Music Space</h1>
+      <p>Music. Focus. Coffee.</p>
     </header>
 
-    <div class="quote-box" id="quoteText"></div>
+    <div class="quote-box" id="quoteText">
+      Click Inspire to begin
+    </div>
 
     <div class="controls">
 
-      <div class="control-row">
-        <button onclick="togglePlay()">Play / Pause</button>
+      <div class="row">
+        <button id="playBtn">Play</button>
         <button onclick="generateQuote()">Inspire</button>
         <button onclick="toggleTheme()">Theme</button>
       </div>
 
-      <div class="control-row">
+      <div class="row">
         <select id="quoteCategory">
-          <option value="auto">Auto Quotes</option>
-          <option value="morning">Morning</option>
+          <option value="auto">Auto</option>
           <option value="focus">Focus</option>
-          <option value="growth">Growth</option>
           <option value="calm">Calm</option>
+          <option value="growth">Growth</option>
           <option value="life">Life</option>
         </select>
 
         <select id="visualizerMode">
           <option value="bars">Bars</option>
           <option value="wave">Wave</option>
-          <option value="minimal">Minimal</option>
         </select>
       </div>
 
@@ -50,27 +49,25 @@
         <span id="remainingTime">-0:00</span>
       </div>
 
-      <div class="control-row">
-        <input type="range" id="volume" min="0" max="1" step="0.01">
+      <div class="row">
+        <label>Volume</label>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.6">
       </div>
 
-      <ul id="playlist" class="playlist"></ul>
+      <div class="row">
+        <select id="trackSelector"></select>
+      </div>
 
     </div>
 
     <canvas id="visualizer"></canvas>
 
-    <footer id="footerInfo">Offline Ready</footer>
+    <footer id="footerInfo">Ready</footer>
 
   </div>
 
   <audio id="audio" preload="metadata"></audio>
   <script src="ItIsShivam.js"></script>
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
-    }
-  </script>
 </body>
 </html>
