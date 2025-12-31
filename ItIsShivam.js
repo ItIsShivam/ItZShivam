@@ -1,148 +1,136 @@
 const audio = document.getElementById("audio");
-const volumeSlider = document.getElementById("volume");
-const progressBar = document.getElementById("progress");
-const bars = document.querySelectorAll(".bar");
+const progress = document.getElementById("progress");
+const currentTimeEl = document.getElementById("currentTime");
+const remainingTimeEl = document.getElementById("remainingTime");
+const volume = document.getElementById("volume");
+const playlistEl = document.getElementById("playlist");
 const quoteText = document.getElementById("quoteText");
-const trackSelector = document.getElementById("trackSelector");
-const footerInfo = document.getElementById("footerInfo");
 const quoteCategory = document.getElementById("quoteCategory");
+const visualizerMode = document.getElementById("visualizerMode");
+const footerInfo = document.getElementById("footerInfo");
+const canvas = document.getElementById("visualizer");
+const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
-/* ================= QUOTES ================= */
+/* ---------------- PLAYLIST ---------------- */
 
-const quotes = {
-  morning: [
-    "Strong coffee. Clear mind.",
-    "Start slow. Build momentum.",
-    "A calm morning sets the tone.",
-    "Show up before the world gets loud."
-  ],
-  focus: [
-    "Progress beats perfection.",
-    "Consistency compounds.",
-    "Do fewer things. Do them better.",
-    "Focus is saying no to many good things."
-  ],
-  growth: [
-    "Small improvements add up.",
-    "Discipline gives freedom.",
-    "Hard days build strong minds."
-  ],
-  calm: [
-    "Calm is a superpower.",
-    "Slow down to speed up.",
-    "Protect your energy."
-  ],
-  life: [
-    "Build a life you do not need to escape from.",
-    "Choose progress over approval.",
-    "Momentum comes from showing up."
-  ]
+let tracks = [
+  { title: "Mortals", src: "mortals-funk-remix.mp3" },
+  { title: "On & On", src: "on-and-on.mp3" },
+  { title: "Make Me Move", src: "make-me-move.mp3" },
+  { title: "Heroes Tonight", src: "heroes-tonight.mp3" }
+];
+
+function renderPlaylist() {
+  playlistEl.innerHTML = "";
+  tracks.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.textContent = t.title;
+    li.draggable = true;
+    li.onclick = () => playTrack(i);
+
+    li.addEventListener("dragstart", e => e.dataTransfer.setData("i", i));
+    li.addEventListener("drop", e => {
+      const from = e.dataTransfer.getData("i");
+      [tracks[from], tracks[i]] = [tracks[i], tracks[from]];
+      renderPlaylist();
+    });
+    li.addEventListener("dragover", e => e.preventDefault());
+
+    playlistEl.appendChild(li);
+  });
+}
+
+function playTrack(i) {
+  audio.src = tracks[i].src;
+  audio.play();
+  footerInfo.textContent = "Now Playing: " + tracks[i].title;
+  isPlaying = true;
+}
+
+renderPlaylist();
+
+/* ---------------- AUDIO ---------------- */
+
+function togglePlay() {
+  if (!audio.src) playTrack(0);
+  else isPlaying ? audio.pause() : audio.play();
+  isPlaying = !isPlaying;
+}
+
+volume.oninput = () => audio.volume = volume.value;
+
+audio.ontimeupdate = () => {
+  progress.value = (audio.currentTime / audio.duration) * 100;
+  currentTimeEl.textContent = format(audio.currentTime);
+  remainingTimeEl.textContent = "-" + format(audio.duration - audio.currentTime);
 };
 
-function getTimeMood() {
-  const h = new Date().getHours();
-  if (h >= 5 && h < 11) return "morning";
-  if (h >= 11 && h < 17) return "focus";
-  if (h >= 17 && h < 21) return "growth";
-  return "calm";
+progress.oninput = () => audio.currentTime = (progress.value / 100) * audio.duration;
+
+function format(s) {
+  const m = Math.floor(s / 60);
+  const r = Math.floor(s % 60);
+  return `${m}:${r < 10 ? "0" : ""}${r}`;
 }
 
-function setQuote(text) {
-  quoteText.style.opacity = 0;
-  quoteText.style.transform = "scale(0.97)";
-  setTimeout(() => {
-    quoteText.textContent = text;
-    quoteText.style.opacity = 1;
-    quoteText.style.transform = "scale(1)";
-    localStorage.setItem("lastQuote", text);
-  }, 250);
-}
+/* ---------------- QUOTES ---------------- */
+
+const quotes = {
+  focus: ["Progress beats perfection.", "Consistency compounds."],
+  calm: ["Calm is a superpower.", "Slow is smooth."],
+  life: ["Build a life you do not need to escape from."]
+};
 
 function generateQuote() {
-  const category =
-    quoteCategory.value === "auto"
-      ? getTimeMood()
-      : quoteCategory.value;
-
-  const pool = [...quotes[category], ...quotes.life];
-  const q = pool[Math.floor(Math.random() * pool.length)];
-  setQuote(q);
+  const cat = quoteCategory.value === "auto" ? "focus" : quoteCategory.value;
+  const q = quotes[cat][Math.floor(Math.random() * quotes[cat].length)];
+  quoteText.style.opacity = 0;
+  setTimeout(() => {
+    quoteText.textContent = q;
+    quoteText.style.opacity = 1;
+  }, 200);
 }
 
-const savedQuote = localStorage.getItem("lastQuote");
-if (savedQuote) quoteText.textContent = savedQuote;
-
-/* ================= AUDIO ================= */
+/* ---------------- VISUALIZER ---------------- */
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 const source = audioCtx.createMediaElementSource(audio);
 const analyser = audioCtx.createAnalyser();
 
-analyser.fftSize = 64;
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
+analyser.fftSize = 256;
 
-const dataArray = new Uint8Array(analyser.frequencyBinCount);
+const buffer = new Uint8Array(analyser.frequencyBinCount);
 
-function animateEqualizer() {
-  requestAnimationFrame(animateEqualizer);
-  analyser.getByteFrequencyData(dataArray);
-  bars.forEach((bar, i) => {
-    bar.style.height = Math.max(dataArray[i] / 3, 8) + "px";
-  });
-}
+function draw() {
+  requestAnimationFrame(draw);
+  analyser.getByteFrequencyData(buffer);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function togglePlay() {
-  if (!isPlaying) {
-    audioCtx.resume();
-    audio.play();
-    animateEqualizer();
-    isPlaying = true;
-  } else {
-    audio.pause();
-    isPlaying = false;
+  if (visualizerMode.value === "bars") {
+    buffer.forEach((v, i) => {
+      ctx.fillRect(i * 3, canvas.height, 2, -v / 2);
+    });
+  }
+
+  if (visualizerMode.value === "wave") {
+    ctx.beginPath();
+    buffer.forEach((v, i) => {
+      ctx.lineTo(i * 3, canvas.height - v / 2);
+    });
+    ctx.stroke();
   }
 }
 
-volumeSlider.addEventListener("input", () => {
-  audio.volume = volumeSlider.value;
-});
+draw();
 
-/* Progress bar */
-audio.addEventListener("timeupdate", () => {
-  if (audio.duration) {
-    progressBar.value = (audio.currentTime / audio.duration) * 100;
-  }
-});
+/* ---------------- THEME ---------------- */
 
-progressBar.addEventListener("input", () => {
-  audio.currentTime = (progressBar.value / 100) * audio.duration;
-});
-
-/* Tracks */
-trackSelector.addEventListener("change", () => {
-  audio.src = trackSelector.value;
-  footerInfo.textContent =
-    "Now Playing: " + trackSelector.options[trackSelector.selectedIndex].text;
-  if (isPlaying) audio.play();
-});
-
-audio.addEventListener("ended", () => {
-  trackSelector.selectedIndex =
-    (trackSelector.selectedIndex + 1) % trackSelector.options.length;
-  audio.src = trackSelector.value;
-  footerInfo.textContent =
-    "Now Playing: " + trackSelector.options[trackSelector.selectedIndex].text;
-  audio.play();
-});
-
-/* Theme */
 function toggleTheme() {
-  document.body.classList.toggle("light");
   document.body.classList.toggle("dark");
+  document.body.classList.toggle("light");
 }
-
-audio.volume = volumeSlider.value;
