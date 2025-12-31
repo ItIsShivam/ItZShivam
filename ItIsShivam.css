@@ -153,7 +153,7 @@ select {
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.4);
-  background: linear-gradient(135deg, #4b4b4b, #2c2c2c);
+  background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
   color: #fff;
   font-size: 1em;
   cursor: pointer;
@@ -179,41 +179,48 @@ select::after {
   animation: floatArrow 2s ease-in-out infinite;
 }
 
-/* Stop floating on focus/open */
+/* Stop floating on focus */
 select:focus::after {
   animation: none;
   transform: translateY(-50%) rotate(-135deg);
 }
 
-/* Light mode for select */
+/* Dark mode dropdown hover/focus */
+select:hover {
+  background: linear-gradient(135deg, #4b4b4b, #3a3a3a);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+}
+
+select:focus {
+  outline: none;
+  background: linear-gradient(135deg, #5c5c5c, #444);
+  color: #fff;
+}
+
+/* Light mode styling */
 body.light select {
-  background: linear-gradient(135deg, #fff, #eee);
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
   color: #222;
   border: 1px solid rgba(0,0,0,0.2);
 }
 
-body.light select::after {
-  border-color: #222;
+body.light select:hover {
+  background: linear-gradient(135deg, #e6e6e6, #fff);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Floating animation keyframes */
+body.light select:focus {
+  background: linear-gradient(135deg, #dcdcdc, #fff);
+  color: #222;
+}
+
+/* Floating arrow animation keyframes */
 @keyframes floatArrow {
   0%, 100% { transform: translateY(-50%) rotate(45deg); }
   50% { transform: translateY(-48%) rotate(45deg); }
 }
 
-/* Hover glow */
-select:hover {
-  background: linear-gradient(135deg, #5c5c5c, #3a3a3a);
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-}
-
-body.light select:hover {
-  background: linear-gradient(135deg, #eee, #fff);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* Active select */
+/* Active press effect */
 select:active {
   transform: scale(0.97);
 }
