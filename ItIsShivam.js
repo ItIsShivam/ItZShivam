@@ -2,7 +2,6 @@ const audio = document.getElementById("audio");
 const playBtn = document.getElementById("playBtn");
 const inspireBtn = document.getElementById("inspireBtn");
 const themeBtn = document.getElementById("themeBtn");
-const ambientBtn = document.getElementById("ambientBtn");
 
 const progress = document.getElementById("progress");
 const currentTimeEl = document.getElementById("currentTime");
@@ -22,10 +21,9 @@ const ctx = canvas.getContext("2d");
 
 let audioCtx, analyser, source;
 let isPlaying = false;
-let ambient = false;
 let currentTrackIndex = 0;
 
-/* TRACKS */
+/* TRACK LIST (UNCHANGED) */
 const tracks = [
   { title: "Mortals (Funk Remix)", src: "mortals-funk-remix.mp3" },
   { title: "On & On", src: "on-and-on.mp3" },
@@ -40,10 +38,10 @@ const tracks = [
 ];
 
 tracks.forEach((t, i) => {
-  const o = document.createElement("option");
-  o.value = i;
-  o.textContent = t.title;
-  trackSelector.appendChild(o);
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.textContent = t.title;
+  trackSelector.appendChild(opt);
 });
 
 audio.src = tracks[0].src;
@@ -61,7 +59,7 @@ function initAudio() {
   }
 }
 
-/* PLAY */
+/* PLAY / PAUSE */
 playBtn.onclick = async () => {
   initAudio();
   await audioCtx.resume();
@@ -96,15 +94,15 @@ trackSelector.onchange = () => {
 audio.ontimeupdate = () => {
   if (!audio.duration) return;
   progress.value = (audio.currentTime / audio.duration) * 100;
-  currentTimeEl.textContent = fmt(audio.currentTime);
-  remainingTimeEl.textContent = "-" + fmt(audio.duration - audio.currentTime);
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+  remainingTimeEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
 };
 
 progress.oninput = () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 };
 
-function fmt(t) {
+function formatTime(t) {
   const m = Math.floor(t / 60);
   const s = Math.floor(t % 60);
   return `${m}:${s < 10 ? "0" : ""}${s}`;
@@ -115,9 +113,9 @@ volume.oninput = () => audio.volume = volume.value;
 
 /* QUOTES */
 const quotes = {
-  focus: ["Progress beats perfection.", "Deep work wins."],
+  focus: ["Progress beats perfection.", "Deep work compounds."],
   calm: ["Slow is smooth. Smooth is fast."],
-  growth: ["You grow where you stretch."],
+  growth: ["Discomfort is the price of growth."],
   life: ["Build a life you respect."]
 };
 
@@ -135,14 +133,31 @@ inspireBtn.onclick = () => {
   }, 200);
 };
 
-/* AMBIENT MODE */
-ambientBtn.onclick = () => {
-  ambient = !ambient;
-  document.body.classList.toggle("ambient", ambient);
-  controls.classList.toggle("hidden", ambient);
-};
+/* AUTO AMBIENT MODE */
+let inactivityTimer;
+const AMBIENT_DELAY = 5000;
 
-/* VISUALIZER + BACKGROUND INTENSITY */
+function activateAmbient() {
+  document.body.classList.add("ambient");
+}
+
+function deactivateAmbient() {
+  document.body.classList.remove("ambient");
+}
+
+function resetInactivity() {
+  deactivateAmbient();
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(activateAmbient, AMBIENT_DELAY);
+}
+
+["mousemove", "mousedown", "touchstart", "scroll", "keydown"].forEach(evt => {
+  document.addEventListener(evt, resetInactivity, { passive: true });
+});
+
+resetInactivity();
+
+/* VISUALIZER + SOFT BG RESPONSE */
 function draw() {
   requestAnimationFrame(draw);
   if (!analyser) return;
@@ -151,7 +166,7 @@ function draw() {
   analyser.getByteFrequencyData(data);
 
   const avg = data.reduce((a, b) => a + b) / data.length;
-  document.body.style.backgroundPosition = `${avg}% 50%`;
+  document.body.style.backgroundPosition = `${Math.min(60, avg / 2)}% 50%`;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
