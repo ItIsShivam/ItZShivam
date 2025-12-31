@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shivam's Music Space</title>
+  <title>Shivam Music Space</title>
+
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="ItIsShivam.css">
 </head>
 
@@ -11,76 +13,64 @@
   <div class="main-container">
 
     <header>
-      <h1>Shivam's Music Space</h1>
-      <p>Music. Coffee. Focus.</p>
+      <h1>Shivam Music Space</h1>
+      <p>Focus. Flow. Music.</p>
     </header>
 
-    <section class="quote-display-area">
-      <div class="quote-box" id="quoteText">
-        Click Inspire Me for a fresh thought.
-      </div>
-    </section>
+    <div class="quote-box" id="quoteText"></div>
 
-    <section class="controls">
+    <div class="controls">
 
       <div class="control-row">
-        <button onclick="generateQuote()">Inspire Me</button>
         <button onclick="togglePlay()">Play / Pause</button>
+        <button onclick="generateQuote()">Inspire</button>
         <button onclick="toggleTheme()">Theme</button>
       </div>
 
       <div class="control-row">
-        <label for="quoteCategory">Quotes</label>
         <select id="quoteCategory">
-          <option value="auto">Auto</option>
+          <option value="auto">Auto Quotes</option>
           <option value="morning">Morning</option>
           <option value="focus">Focus</option>
           <option value="growth">Growth</option>
           <option value="calm">Calm</option>
           <option value="life">Life</option>
         </select>
-      </div>
 
-      <div class="control-row">
-        <label for="volume">Volume</label>
-        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
-      </div>
-
-      <div class="control-row">
-        <label for="progress">Progress</label>
-        <input type="range" id="progress" min="0" max="100" value="0">
-      </div>
-
-      <div class="control-row">
-        <label for="trackSelector">Track</label>
-        <select id="trackSelector">
-          <option value="mortals-funk-remix.mp3">Mortals (Funk Remix)</option>
-          <option value="on-and-on.mp3">On & On</option>
-          <option value="make-me-move.mp3">Make Me Move</option>
-          <option value="heroes-tonight.mp3">Heroes Tonight</option>
-          <option value="power.mp3">Power</option>
-          <option value="only-human.mp3">Only Human</option>
-          <option value="want-your-body.mp3">Want Your Body</option>
-          <option value="did-it-mean-forever.mp3">Did It Mean Forever</option>
-          <option value="digital-death.mp3">Digital Death</option>
-          <option value="all-i-need.mp3">All I Need</option>
+        <select id="visualizerMode">
+          <option value="bars">Bars</option>
+          <option value="wave">Wave</option>
+          <option value="minimal">Minimal</option>
         </select>
       </div>
 
-    </section>
+      <div class="progress-row">
+        <span id="currentTime">0:00</span>
+        <input type="range" id="progress" value="0">
+        <span id="remainingTime">-0:00</span>
+      </div>
 
-    <section class="equalizer">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </section>
+      <div class="control-row">
+        <input type="range" id="volume" min="0" max="1" step="0.01">
+      </div>
 
-    <footer id="footerInfo">
-      Now Playing: Mortals (Funk Remix)
-    </footer>
+      <ul id="playlist" class="playlist"></ul>
+
+    </div>
+
+    <canvas id="visualizer"></canvas>
+
+    <footer id="footerInfo">Offline Ready</footer>
 
   </div>
 
-  <audio id="audio" src="mortals-funk-remix.mp3" preload="auto"></audio>
+  <audio id="audio" preload="metadata"></audio>
   <script src="ItIsShivam.js"></script>
+
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js");
+    }
+  </script>
 </body>
 </html>
