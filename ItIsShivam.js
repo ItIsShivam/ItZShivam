@@ -1,79 +1,57 @@
 const audio = document.getElementById("audio");
 const volumeSlider = document.getElementById("volume");
+const progressBar = document.getElementById("progress");
 const bars = document.querySelectorAll(".bar");
 const quoteText = document.getElementById("quoteText");
 const trackSelector = document.getElementById("trackSelector");
 const footerInfo = document.getElementById("footerInfo");
+const quoteCategory = document.getElementById("quoteCategory");
 
 let isPlaying = false;
 
-/* =========================
-   QUOTES BY MOOD
-========================= */
+/* ================= QUOTES ================= */
 
 const quotes = {
   morning: [
     "Strong coffee. Clear mind.",
     "Start slow. Build momentum.",
     "A calm morning sets the tone.",
-    "Show up before the world gets loud.",
-    "Today only asks for your best effort."
+    "Show up before the world gets loud."
   ],
-
   focus: [
     "Progress beats perfection.",
     "Consistency compounds.",
     "Do fewer things. Do them better.",
-    "Focus is saying no to many good things.",
-    "Clarity comes from action."
+    "Focus is saying no to many good things."
   ],
-
   growth: [
     "Small improvements add up.",
     "Discipline gives freedom.",
-    "Hard days build strong minds.",
-    "Growth feels uncomfortable for a reason.",
-    "Your habits shape your future."
+    "Hard days build strong minds."
   ],
-
   calm: [
     "Calm is a superpower.",
-    "Silence helps you hear what matters.",
     "Slow down to speed up.",
-    "Protect your energy.",
-    "Not every win is loud."
+    "Protect your energy."
   ],
-
   life: [
     "Build a life you do not need to escape from.",
     "Choose progress over approval.",
-    "Long term thinking beats short term comfort.",
-    "You are allowed to move at your own pace.",
     "Momentum comes from showing up."
   ]
 };
 
-/* =========================
-   TIME BASED MOOD PICKER
-========================= */
-
 function getTimeMood() {
-  const hour = new Date().getHours();
-
-  if (hour >= 5 && hour < 11) return "morning";
-  if (hour >= 11 && hour < 17) return "focus";
-  if (hour >= 17 && hour < 21) return "growth";
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return "morning";
+  if (h >= 11 && h < 17) return "focus";
+  if (h >= 17 && h < 21) return "growth";
   return "calm";
 }
 
-/* =========================
-   QUOTE DISPLAY
-========================= */
-
 function setQuote(text) {
   quoteText.style.opacity = 0;
-  quoteText.style.transform = "scale(0.98)";
-
+  quoteText.style.transform = "scale(0.97)";
   setTimeout(() => {
     quoteText.textContent = text;
     quoteText.style.opacity = 1;
@@ -83,21 +61,20 @@ function setQuote(text) {
 }
 
 function generateQuote() {
-  const mood = getTimeMood();
-  const pool = [...quotes[mood], ...quotes.life];
-  const randomQuote = pool[Math.floor(Math.random() * pool.length)];
-  setQuote(randomQuote);
+  const category =
+    quoteCategory.value === "auto"
+      ? getTimeMood()
+      : quoteCategory.value;
+
+  const pool = [...quotes[category], ...quotes.life];
+  const q = pool[Math.floor(Math.random() * pool.length)];
+  setQuote(q);
 }
 
-/* Restore last quote */
 const savedQuote = localStorage.getItem("lastQuote");
-if (savedQuote) {
-  quoteText.textContent = savedQuote;
-}
+if (savedQuote) quoteText.textContent = savedQuote;
 
-/* =========================
-   AUDIO + EQUALIZER
-========================= */
+/* ================= AUDIO ================= */
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
@@ -113,16 +90,10 @@ const dataArray = new Uint8Array(analyser.frequencyBinCount);
 function animateEqualizer() {
   requestAnimationFrame(animateEqualizer);
   analyser.getByteFrequencyData(dataArray);
-
   bars.forEach((bar, i) => {
-    const height = Math.max(dataArray[i] / 3, 8);
-    bar.style.height = height + "px";
+    bar.style.height = Math.max(dataArray[i] / 3, 8) + "px";
   });
 }
-
-/* =========================
-   CONTROLS
-========================= */
 
 function togglePlay() {
   if (!isPlaying) {
@@ -136,40 +107,42 @@ function togglePlay() {
   }
 }
 
-function toggleTheme() {
-  document.body.classList.toggle("light");
-  document.body.classList.toggle("dark");
-}
-
 volumeSlider.addEventListener("input", () => {
   audio.volume = volumeSlider.value;
 });
 
+/* Progress bar */
+audio.addEventListener("timeupdate", () => {
+  if (audio.duration) {
+    progressBar.value = (audio.currentTime / audio.duration) * 100;
+  }
+});
+
+progressBar.addEventListener("input", () => {
+  audio.currentTime = (progressBar.value / 100) * audio.duration;
+});
+
+/* Tracks */
 trackSelector.addEventListener("change", () => {
   audio.src = trackSelector.value;
   footerInfo.textContent =
-    "Now Playing: " +
-    trackSelector.options[trackSelector.selectedIndex].text;
-
+    "Now Playing: " + trackSelector.options[trackSelector.selectedIndex].text;
   if (isPlaying) audio.play();
 });
 
-/* =========================
-   AUTO NEXT TRACK
-========================= */
-
 audio.addEventListener("ended", () => {
-  let nextIndex = (trackSelector.selectedIndex + 1) % trackSelector.options.length;
-  trackSelector.selectedIndex = nextIndex;
+  trackSelector.selectedIndex =
+    (trackSelector.selectedIndex + 1) % trackSelector.options.length;
   audio.src = trackSelector.value;
   footerInfo.textContent =
-    "Now Playing: " +
-    trackSelector.options[trackSelector.selectedIndex].text;
+    "Now Playing: " + trackSelector.options[trackSelector.selectedIndex].text;
   audio.play();
 });
 
-/* =========================
-   INITIAL STATE
-========================= */
+/* Theme */
+function toggleTheme() {
+  document.body.classList.toggle("light");
+  document.body.classList.toggle("dark");
+}
 
 audio.volume = volumeSlider.value;
