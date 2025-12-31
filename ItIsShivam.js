@@ -2,6 +2,7 @@ const audio = document.getElementById("audio");
 const playBtn = document.getElementById("playBtn");
 const inspireBtn = document.getElementById("inspireBtn");
 const themeBtn = document.getElementById("themeBtn");
+const ambientBtn = document.getElementById("ambientBtn");
 
 const progress = document.getElementById("progress");
 const currentTimeEl = document.getElementById("currentTime");
@@ -15,17 +16,16 @@ const quoteText = document.getElementById("quoteText");
 const quoteCategory = document.getElementById("quoteCategory");
 const visualizerMode = document.getElementById("visualizerMode");
 
+const controls = document.getElementById("controls");
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 
+let audioCtx, analyser, source;
 let isPlaying = false;
-let audioCtx = null;
-let analyser = null;
-let source = null;
+let ambient = false;
 let currentTrackIndex = 0;
 
-/* -------- TRACK LIST (UNCHANGED) -------- */
-
+/* TRACKS */
 const tracks = [
   { title: "Mortals (Funk Remix)", src: "mortals-funk-remix.mp3" },
   { title: "On & On", src: "on-and-on.mp3" },
@@ -39,32 +39,30 @@ const tracks = [
   { title: "All I Need", src: "all-i-need.mp3" }
 ];
 
-tracks.forEach((track, index) => {
-  const opt = document.createElement("option");
-  opt.value = index;
-  opt.textContent = track.title;
-  trackSelector.appendChild(opt);
+tracks.forEach((t, i) => {
+  const o = document.createElement("option");
+  o.value = i;
+  o.textContent = t.title;
+  trackSelector.appendChild(o);
 });
 
 audio.src = tracks[0].src;
 
-/* -------- AUDIO CONTEXT INIT -------- */
-
+/* AUDIO INIT */
 function initAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
     source = audioCtx.createMediaElementSource(audio);
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
-    analyser.fftSize = 256;
-    drawVisualizer();
+    draw();
   }
 }
 
-/* -------- PLAY / PAUSE -------- */
-
-playBtn.addEventListener("click", async () => {
+/* PLAY */
+playBtn.onclick = async () => {
   initAudio();
   await audioCtx.resume();
 
@@ -77,108 +75,116 @@ playBtn.addEventListener("click", async () => {
     playBtn.textContent = "Play";
     isPlaying = false;
   }
+};
 
-  footerInfo.textContent = "Now Playing: " + tracks[currentTrackIndex].title;
-});
-
-/* -------- TRACK CHANGE -------- */
-
-trackSelector.addEventListener("change", () => {
-  currentTrackIndex = Number(trackSelector.value);
-  audio.src = tracks[currentTrackIndex].src;
-  footerInfo.textContent = "Now Playing: " + tracks[currentTrackIndex].title;
-  if (isPlaying) audio.play();
-});
-
-/* -------- AUTOPLAY NEXT TRACK -------- */
-
+/* AUTOPLAY NEXT */
 audio.addEventListener("ended", () => {
   currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
   trackSelector.value = currentTrackIndex;
   audio.src = tracks[currentTrackIndex].src;
   audio.play();
-  footerInfo.textContent = "Now Playing: " + tracks[currentTrackIndex].title;
 });
 
-/* -------- PROGRESS -------- */
+/* TRACK SELECT */
+trackSelector.onchange = () => {
+  currentTrackIndex = Number(trackSelector.value);
+  audio.src = tracks[currentTrackIndex].src;
+  if (isPlaying) audio.play();
+};
 
-audio.addEventListener("timeupdate", () => {
+/* PROGRESS */
+audio.ontimeupdate = () => {
   if (!audio.duration) return;
   progress.value = (audio.currentTime / audio.duration) * 100;
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  remainingTimeEl.textContent = "-" + formatTime(audio.duration - audio.currentTime);
-});
+  currentTimeEl.textContent = fmt(audio.currentTime);
+  remainingTimeEl.textContent = "-" + fmt(audio.duration - audio.currentTime);
+};
 
-progress.addEventListener("input", () => {
+progress.oninput = () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
-});
+};
 
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
+function fmt(t) {
+  const m = Math.floor(t / 60);
+  const s = Math.floor(t % 60);
   return `${m}:${s < 10 ? "0" : ""}${s}`;
 }
 
-/* -------- VOLUME -------- */
+/* VOLUME */
+volume.oninput = () => audio.volume = volume.value;
 
-volume.addEventListener("input", () => {
-  audio.volume = volume.value;
-});
-
-/* -------- QUOTES -------- */
-
+/* QUOTES */
 const quotes = {
-  focus: ["Progress beats perfection.", "Consistency compounds."],
-  calm: ["Calm is a superpower.", "Slow down to speed up."],
-  growth: ["Growth feels uncomfortable for a reason."],
-  life: ["Build a life you do not need to escape from."]
+  focus: ["Progress beats perfection.", "Deep work wins."],
+  calm: ["Slow is smooth. Smooth is fast."],
+  growth: ["You grow where you stretch."],
+  life: ["Build a life you respect."]
 };
 
-function generateQuote() {
-  const category =
-    quoteCategory.value === "auto"
-      ? Object.keys(quotes)[Math.floor(Math.random() * Object.keys(quotes).length)]
-      : quoteCategory.value;
+inspireBtn.onclick = () => {
+  const keys = Object.keys(quotes);
+  const cat = quoteCategory.value === "auto"
+    ? keys[Math.floor(Math.random() * keys.length)]
+    : quoteCategory.value;
 
-  const quote = quotes[category][Math.floor(Math.random() * quotes[category].length)];
-
+  const q = quotes[cat][Math.floor(Math.random() * quotes[cat].length)];
   quoteText.style.opacity = 0;
-  quoteText.style.transform = "scale(0.98)";
   setTimeout(() => {
-    quoteText.textContent = quote;
+    quoteText.textContent = q;
     quoteText.style.opacity = 1;
-    quoteText.style.transform = "scale(1)";
   }, 200);
-}
+};
 
-inspireBtn.addEventListener("click", generateQuote);
+/* AMBIENT MODE */
+ambientBtn.onclick = () => {
+  ambient = !ambient;
+  document.body.classList.toggle("ambient", ambient);
+  controls.classList.toggle("hidden", ambient);
+};
 
-/* -------- VISUALIZER -------- */
-
-function drawVisualizer() {
-  requestAnimationFrame(drawVisualizer);
+/* VISUALIZER + BACKGROUND INTENSITY */
+function draw() {
+  requestAnimationFrame(draw);
   if (!analyser) return;
 
-  const buffer = new Uint8Array(analyser.frequencyBinCount);
-  analyser.getByteFrequencyData(buffer);
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  analyser.getByteFrequencyData(data);
+
+  const avg = data.reduce((a, b) => a + b) / data.length;
+  document.body.style.backgroundPosition = `${avg}% 50%`;
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (visualizerMode.value === "bars") {
-    buffer.forEach((v, i) => {
+  if (visualizerMode.value === "radial") {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    data.forEach((v, i) => {
+      const angle = (i / data.length) * Math.PI * 2;
+      const r = v / 3;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+      ctx.stroke();
+    });
+  } else if (visualizerMode.value === "dots") {
+    data.forEach((v, i) => {
+      ctx.beginPath();
+      ctx.arc(i * 3, canvas.height - v / 2, 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  } else if (visualizerMode.value === "wave") {
+    ctx.beginPath();
+    data.forEach((v, i) => ctx.lineTo(i * 3, canvas.height - v / 2));
+    ctx.stroke();
+  } else {
+    data.forEach((v, i) => {
       ctx.fillRect(i * 3, canvas.height, 2, -v / 2);
     });
-  } else {
-    ctx.beginPath();
-    buffer.forEach((v, i) => {
-      ctx.lineTo(i * 3, canvas.height - v / 2);
-    });
-    ctx.stroke();
   }
 }
 
-/* -------- THEME -------- */
-
-themeBtn.addEventListener("click", () => {
+/* THEME */
+themeBtn.onclick = () => {
   document.body.classList.toggle("dark");
   document.body.classList.toggle("light");
-});
+};
