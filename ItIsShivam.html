@@ -11,15 +11,15 @@
   <div class="main-container">
 
     <header>
-      <h1>Shivam's Music Space</h1>
-      <p>Music. Focus. Coffee.</p>
+      <h1 id="title">Shivam's Music Space</h1>
+      <p id="subtitle">Music. Focus. Coffee.</p>
     </header>
 
     <div class="quote-box" id="quoteText">
       Click Inspire to begin
     </div>
 
-    <div class="controls" id="controls">
+    <div class="controls">
 
       <div class="row">
         <button onclick="generateQuote()">Inspire</button>
@@ -36,6 +36,21 @@
         <span id="currentTime">0:00</span>
         <input type="range" id="progress" min="0" max="100" value="0">
         <span id="duration">0:00</span>
+      </div>
+
+      <div class="row">
+        <select id="visualizerMode">
+          <option value="bars">Color Bars</option>
+          <option value="wave">Wave Flow</option>
+          <option value="pulse">Pulse Glow</option>
+        </select>
+
+        <select id="quoteCategory">
+          <option value="all">All Quotes</option>
+          <option value="focus">Focus</option>
+          <option value="life">Life</option>
+          <option value="calm">Calm</option>
+        </select>
       </div>
 
       <div class="row">
