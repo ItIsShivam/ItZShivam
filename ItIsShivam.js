@@ -5,29 +5,36 @@ const currentTimeEl = document.getElementById("currentTime");
 const durationEl = document.getElementById("duration");
 const trackSelector = document.getElementById("trackSelector");
 const quoteText = document.getElementById("quoteText");
+const quoteCategory = document.getElementById("quoteCategory");
+const visualizerMode = document.getElementById("visualizerMode");
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
-/* Quotes */
-const quotes = [
-  "Strong coffee. Clear mind.",
-  "Progress beats perfection.",
-  "Consistency compounds.",
-  "Focus on what matters.",
-  "Small steps add up.",
-  "Calm mind. Steady work.",
-  "Discipline creates freedom.",
-  "Create space to think.",
-  "Growth takes patience.",
-  "Energy follows attention.",
-  "Do less, but do it well.",
-  "Direction matters more than speed.",
-  "Clarity comes from action."
-];
+/* Quotes by category */
+const quotes = {
+  all: [],
+  focus: [
+    "Strong coffee. Clear mind.",
+    "Focus on what matters.",
+    "Consistency compounds."
+  ],
+  life: [
+    "Small steps add up.",
+    "Growth takes patience.",
+    "Direction matters more than speed."
+  ],
+  calm: [
+    "Calm mind. Steady work.",
+    "Create space to think.",
+    "Silence builds clarity."
+  ]
+};
 
-/* Audio Context */
+quotes.all = [...quotes.focus, ...quotes.life, ...quotes.calm];
+
+/* Audio setup */
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 const source = audioCtx.createMediaElementSource(audio);
@@ -39,70 +46,55 @@ analyser.connect(audioCtx.destination);
 
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-/* Load first track */
 audio.src = trackSelector.value;
 
-/* Visualizer + Beat Reactive Background */
-function drawVisualizer() {
-  requestAnimationFrame(drawVisualizer);
+/* Visualizer */
+function draw() {
+  requestAnimationFrame(draw);
   analyser.getByteFrequencyData(dataArray);
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let bassSum = 0;
-  const bassRange = Math.floor(dataArray.length * 0.25);
-
-  const barWidth = canvas.width / dataArray.length;
+  let bass = 0;
+  const bassEnd = dataArray.length * 0.25;
 
   dataArray.forEach((v, i) => {
-    if (i < bassRange) bassSum += v;
-
-    ctx.fillStyle = `hsl(${180 + v * 0.4}, 55%, 55%)`;
-    ctx.fillRect(
-      i * barWidth,
-      canvas.height - v / 2,
-      barWidth - 2,
-      v / 2
-    );
+    if (i < bassEnd) bass += v;
   });
 
-  /* Beat intensity */
-  const bassIntensity = bassSum / bassRange / 255;
-
-  /* Background reaction (soft + safe) */
-  const hue = 190 + bassIntensity * 60;
-  const opacity = Math.min(0.35, bassIntensity);
+  const intensity = bass / bassEnd / 255;
+  const hue = 180 + intensity * 120;
 
   document.body.style.setProperty(
     "--beat-bg",
-    `radial-gradient(circle at center, hsla(${hue}, 60%, 55%, ${opacity}), transparent 70%)`
+    `radial-gradient(circle, hsla(${hue},60%,55%,${intensity}), transparent 70%)`
   );
+  document.body.style.setProperty("--beat-opacity", intensity);
 
-  document.body.style.setProperty("--beat-opacity", opacity);
+  const barWidth = canvas.width / dataArray.length;
 
-  document.body.style.setProperty(
-    "--overlay-bg",
-    `radial-gradient(circle at center, hsla(${hue}, 60%, 55%, ${opacity}), transparent 70%)`
-  );
+  if (visualizerMode.value === "bars") {
+    dataArray.forEach((v, i) => {
+      ctx.fillStyle = `hsl(${hue + i},60%,55%)`;
+      ctx.fillRect(i * barWidth, canvas.height - v / 2, barWidth - 2, v / 2);
+    });
+  }
 
-  document.body.style.setProperty("--overlay-opacity", opacity);
+  if (visualizerMode.value === "wave") {
+    ctx.beginPath();
+    ctx.strokeStyle = `hsl(${hue},70%,60%)`;
+    dataArray.forEach((v, i) => {
+      const y = canvas.height / 2 + (v - 128);
+      ctx.lineTo(i * barWidth, y);
+    });
+    ctx.stroke();
+  }
 
-  document.body.style.setProperty(
-    "--dynamic-bg",
-    `hsla(${hue}, 40%, 15%, ${opacity})`
-  );
-
-  document.body.style.setProperty("--dynamic-opacity", opacity);
-
-  document.body.style.setProperty("--bg-hue", hue);
-  document.body.style.setProperty("--bg-strength", opacity);
-
-  document.body.style.setProperty(
-    "background-image",
-    `radial-gradient(circle at center, hsla(${hue}, 60%, 55%, ${opacity}), transparent 70%)`
-  );
-
-  document.body.style.setProperty("--beat-opacity", opacity);
+  if (visualizerMode.value === "pulse") {
+    ctx.fillStyle = `hsla(${hue},70%,60%,0.6)`;
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 30 + intensity * 80, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 /* Controls */
@@ -110,7 +102,7 @@ function togglePlay() {
   if (!isPlaying) {
     audioCtx.resume();
     audio.play();
-    drawVisualizer();
+    draw();
     isPlaying = true;
   } else {
     audio.pause();
@@ -128,42 +120,37 @@ volume.addEventListener("input", () => {
 });
 
 function generateQuote() {
-  quoteText.style.opacity = 0;
-  setTimeout(() => {
-    quoteText.textContent =
-      quotes[Math.floor(Math.random() * quotes.length)];
-    quoteText.style.opacity = 1;
-  }, 200);
+  const cat = quoteCategory.value;
+  const list = quotes[cat];
+  quoteText.textContent = list[Math.floor(Math.random() * list.length)];
 }
 
 /* Progress */
 audio.addEventListener("timeupdate", () => {
   progress.value = (audio.currentTime / audio.duration) * 100 || 0;
-  currentTimeEl.textContent = formatTime(audio.currentTime);
-  durationEl.textContent = formatTime(audio.duration);
+  currentTimeEl.textContent = format(audio.currentTime);
+  durationEl.textContent = format(audio.duration);
 });
 
 progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* Autoplay next track */
+/* Autoplay next */
 audio.addEventListener("ended", () => {
-  let i = trackSelector.selectedIndex;
-  trackSelector.selectedIndex = (i + 1) % trackSelector.options.length;
+  trackSelector.selectedIndex =
+    (trackSelector.selectedIndex + 1) % trackSelector.options.length;
   audio.src = trackSelector.value;
   audio.play();
 });
 
-/* Track change */
 trackSelector.addEventListener("change", () => {
   audio.src = trackSelector.value;
   if (isPlaying) audio.play();
 });
 
-/* Helpers */
-function formatTime(sec) {
-  if (!sec || isNaN(sec)) return "0:00";
+function format(sec) {
+  if (!sec) return "0:00";
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
