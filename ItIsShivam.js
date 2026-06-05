@@ -1,6 +1,8 @@
-// ====== IMMEDIATE THEME LOADING (Prevents light mode screen flash) ======
+// ====== IMMEDIATE THEME LOADING ======
 const savedTheme = localStorage.getItem("theme") || "dark";
-if (savedTheme === "light") {
+let isLightMode = savedTheme === "light"; // Stored in memory for fast access
+
+if (isLightMode) {
   document.body.classList.add("light");
   document.body.classList.remove("dark");
 } else {
@@ -19,11 +21,11 @@ const quoteText = document.getElementById("quoteText");
 const quoteCategory = document.getElementById("quoteCategory");
 const visualizerMode = document.getElementById("visualizerMode");
 const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { alpha: false }); // Optimization: set alpha false if bg is solid, remove if transparent is needed
 
 let isPlaying = false;
 
-// Web Audio Processing pipelines (Initialized purely on-demand)
+// Web Audio Processing pipelines
 let audioCtx = null;
 let source = null;
 let analyser = null;
@@ -56,13 +58,8 @@ const quotes = {
 };
 quotes.all = [...quotes.focus, ...quotes.career, ...quotes.calm];
 
-// Bind baseline media value
 audio.src = trackSelector.value;
 
-/**
- * Lazy Initializer for Web Audio Engine
- * Defers instantiation until real physical user gesture to pass browser policy locks
- */
 function initAudioContext() {
   if (audioCtx) return; 
 
@@ -78,18 +75,20 @@ function initAudioContext() {
   dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-/* High DPI Canvas Scaling Controller */
+/* High DPI Canvas Scaling Controller - OPTIMIZED FOR MOBILE */
 function resizeCanvas() {
-  const dpr = window.devicePixelRatio || 1;
+  // Cap DPR at 2. Anything higher kills mobile performance for minimal visual gain.
+  const dpr = Math.min(window.devicePixelRatio || 1, 2); 
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
   ctx.scale(dpr, dpr);
 }
-window.addEventListener('resize', () => { requestAnimationFrame(resizeCanvas); });
+window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 /* Audio Reactive Engine Loop */
+let lastIntensity = 0; // To smooth out heavy CSS repaints
 function draw() {
   if (!isPlaying || !analyser) return;
   requestAnimationFrame(draw);
@@ -102,16 +101,22 @@ function draw() {
 
   let bass = 0;
   const bassEnd = dataArray.length * 0.25;
-  dataArray.forEach((v, i) => { if (i < bassEnd) bass += v; });
+  for (let i = 0; i < bassEnd; i++) {
+    bass += dataArray[i];
+  }
 
   const intensity = bass / bassEnd / 255;
   const hue = 180 + intensity * 120;
 
-  document.body.style.setProperty(
-    "--beat-bg",
-    `radial-gradient(circle, hsla(${hue},60%,55%,${intensity}), transparent 70%)`
-  );
-  document.body.style.setProperty("--beat-opacity", intensity);
+  // Optimization: Only update DOM styles if the change is noticeable to prevent layout thrashing
+  if (Math.abs(lastIntensity - intensity) > 0.05) {
+    document.body.style.setProperty(
+      "--beat-bg",
+      `radial-gradient(circle, hsla(${hue},60%,55%,${intensity}), transparent 70%)`
+    );
+    document.body.style.setProperty("--beat-opacity", intensity);
+    lastIntensity = intensity;
+  }
 
   const barWidth = w / dataArray.length;
 
@@ -142,8 +147,7 @@ function draw() {
 function togglePlay() {
   const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
-    initAudioContext(); // Instantiates nodes seamlessly on execution gesture
-    
+    initAudioContext();
     if (audioCtx.state === 'suspended') audioCtx.resume();
     audio.play();
     isPlaying = true;
@@ -161,8 +165,9 @@ function toggleTheme() {
   document.body.classList.toggle("light");
   document.body.classList.toggle("dark");
   
-  const currentMode = document.body.classList.contains("light") ? "light" : "dark";
-  localStorage.setItem("theme", currentMode);
+  // Update memory state to prevent heavy DOM lookups in animation loop
+  isLightMode = document.body.classList.contains("light");
+  localStorage.setItem("theme", isLightMode ? "light" : "dark");
 }
 
 volume.addEventListener("input", () => { audio.volume = volume.value; });
@@ -178,7 +183,6 @@ function generateQuote() {
 }
 quoteText.style.transition = "opacity 0.2s ease";
 
-/* Dynamic Media Events mapping */
 audio.addEventListener("timeupdate", () => {
   if (!isNaN(audio.duration)) {
     progress.value = (audio.currentTime / audio.duration) * 100 || 0;
@@ -221,13 +225,11 @@ const dnaCtx = dnaCanvas.getContext('2d');
 let scrollPos = 0;
 window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
-});
+}, { passive: true }); // Optimization: Passive listeners for scrolling
 
-// 1. Setup Tracking for Mouse and Touch Interactions
 let mouse = { x: null, y: null, radius: 150 }; 
-let isInteracting = false; // Tracks if the user is actively clicking/touching
+let isInteracting = false; 
 
-// Mouse Events
 window.addEventListener('mousedown', () => isInteracting = true);
 window.addEventListener('mouseup', () => isInteracting = false);
 window.addEventListener('mousemove', (e) => {
@@ -240,7 +242,6 @@ window.addEventListener('mouseout', () => {
   mouse.y = null;
 });
 
-// Touch Events (Mobile/Tablet Support)
 window.addEventListener('touchstart', (e) => {
   isInteracting = true;
   mouse.x = e.touches[0].clientX;
@@ -259,7 +260,8 @@ window.addEventListener('touchend', () => {
 });
 
 function resizeDnaCanvas() {
-  const dpr = window.devicePixelRatio || 1;
+  // Cap DPR for performance
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
   dnaCanvas.width = window.innerWidth * dpr;
   dnaCanvas.height = window.innerHeight * dpr;
   dnaCtx.scale(dpr, dpr);
@@ -267,18 +269,44 @@ function resizeDnaCanvas() {
 window.addEventListener('resize', resizeDnaCanvas);
 resizeDnaCanvas();
 
-// 2. Setup Spring Physics Arrays
-const nodes = 70;
-// We store a separate x/y offset (dx, dy) and velocity (vx, vy) for every single dot
+// Optimization: Reduce node count on mobile to save CPU/GPU overhead
+const isMobileDevice = window.innerWidth < 768;
+const nodes = isMobileDevice ? 45 : 70; 
+
 const particles = Array.from({ length: nodes }, () => ({
   dx1: 0, dy1: 0, vx1: 0, vy1: 0,
   dx2: 0, dy2: 0, vx2: 0, vy2: 0
 }));
 
-// Physics Tuners
-const SPRING = 0.05;   // Snap-back strength (Lower = looser, slower return)
-const FRICTION = 0.82; // Momentum damping (Higher = more bouncy/wobbly)
-const REPULSION = 18;  // Explosive push force when clicking/touching
+const SPRING = 0.05;   
+const FRICTION = 0.82; 
+const REPULSION = 18;  
+
+function applyPhysics(rawX, rawY, dx, dy, vx, vy) {
+  vx -= dx * SPRING;
+  vy -= dy * SPRING;
+
+  if (isInteracting && mouse.x !== null && mouse.y !== null) {
+    const actualX = rawX + dx;
+    const actualY = rawY + dy;
+    const distX = mouse.x - actualX;
+    const distY = mouse.y - actualY;
+    const distance = Math.sqrt(distX * distX + distY * distY);
+    
+    if (distance < mouse.radius) {
+      const force = (mouse.radius - distance) / mouse.radius;
+      vx -= (distX / distance) * force * REPULSION;
+      vy -= (distY / distance) * force * REPULSION;
+    }
+  }
+
+  vx *= FRICTION;
+  vy *= FRICTION;
+  dx += vx;
+  dy += vy;
+
+  return { dx, dy, vx, vy, x: rawX + dx, y: rawY + dy };
+}
 
 function drawDNA() {
   const w = window.innerWidth;
@@ -291,46 +319,12 @@ function drawDNA() {
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
 
-  const isLightMode = document.body.classList.contains('light');
+  // Optimization: Memory state read instead of DOM classList read
   const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
   const dotColorAccent = '#ff9f43'; 
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
-  const isMobile = w < 768;
-  const maxAmplitude = isMobile ? 80 : 180; 
-
-  // 3. Core Physics Function
-  function applyPhysics(rawX, rawY, dx, dy, vx, vy) {
-    // A. Apply spring tension (Pulls the offset back to 0)
-    vx -= dx * SPRING;
-    vy -= dy * SPRING;
-
-    // B. Apply breaking interaction if actively clicked/touched
-    if (isInteracting && mouse.x !== null && mouse.y !== null) {
-      const actualX = rawX + dx;
-      const actualY = rawY + dy;
-      const distX = mouse.x - actualX;
-      const distY = mouse.y - actualY;
-      const distance = Math.sqrt(distX * distX + distY * distY);
-      
-      if (distance < mouse.radius) {
-        const force = (mouse.radius - distance) / mouse.radius;
-        // Pushes the dot explosively outwards from the cursor
-        vx -= (distX / distance) * force * REPULSION;
-        vy -= (distY / distance) * force * REPULSION;
-      }
-    }
-
-    // C. Apply friction so they don't bounce forever
-    vx *= FRICTION;
-    vy *= FRICTION;
-
-    // D. Update final offset limits
-    dx += vx;
-    dy += vy;
-
-    return { dx, dy, vx, vy, x: rawX + dx, y: rawY + dy };
-  }
+  const maxAmplitude = isMobileDevice ? 80 : 180; 
 
   for(let i = 0; i < nodes; i++) {
     const progressVal = i / nodes; 
@@ -338,13 +332,11 @@ function drawDNA() {
     const amplitude = 15 + Math.pow(progressVal, 1.8) * maxAmplitude; 
     const angle = (progressVal * Math.PI * 12) + totalRotation; 
 
-    // Base coordinates
     const rawX1 = centerX + Math.cos(angle) * amplitude;
     const rawX2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
     const z1 = Math.sin(angle);
     const z2 = Math.sin(angle + Math.PI);
 
-    // Apply the physics simulation to this specific node pair
     const p = particles[i];
     
     const state1 = applyPhysics(rawX1, baseY, p.dx1, p.dy1, p.vx1, p.vy1);
@@ -353,33 +345,32 @@ function drawDNA() {
     const state2 = applyPhysics(rawX2, baseY, p.dx2, p.dy2, p.vx2, p.vy2);
     p.dx2 = state2.dx; p.dy2 = state2.dy; p.vx2 = state2.vx; p.vy2 = state2.vy;
 
-    // Visual detail: Fade out lines if the DNA is "broken" too far apart
     const lineDist = Math.sqrt(Math.pow(state2.x - state1.x, 2) + Math.pow(state2.y - state1.y, 2));
     const originalDist = Math.abs(rawX2 - rawX1); 
     const stretchRatio = Math.max(0, 1 - (lineDist - originalDist) / 100);
 
-    // Draw connecting lines
     dnaCtx.beginPath();
     dnaCtx.moveTo(state1.x, state1.y);
     dnaCtx.lineTo(state2.x, state2.y);
     dnaCtx.strokeStyle = lineColor;
-    dnaCtx.globalAlpha = stretchRatio; // Fades out under strain
+    dnaCtx.globalAlpha = stretchRatio; 
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
     dnaCtx.globalAlpha = 1.0;
 
-    // Draw 3D dots
-    function drawDot(x, y, z, color1, color2) {
-      const radius = 2 + z * 1.5; 
-      dnaCtx.fillStyle = z > 0 ? color2 : color1; 
-      dnaCtx.globalAlpha = 0.3 + ((z + 1) / 2) * 0.7; 
-      dnaCtx.beginPath();
-      dnaCtx.arc(x, y, Math.max(0.1, radius), 0, Math.PI * 2);
-      dnaCtx.fill();
-    }
+    const radius1 = Math.max(0.1, 2 + z1 * 1.5);
+    dnaCtx.fillStyle = z1 > 0 ? dotColorAccent : dotColorMain; 
+    dnaCtx.globalAlpha = 0.3 + ((z1 + 1) / 2) * 0.7; 
+    dnaCtx.beginPath();
+    dnaCtx.arc(state1.x, state1.y, radius1, 0, Math.PI * 2);
+    dnaCtx.fill();
 
-    drawDot(state1.x, state1.y, z1, dotColorMain, dotColorAccent);
-    drawDot(state2.x, state2.y, z2, dotColorMain, dotColorAccent);
+    const radius2 = Math.max(0.1, 2 + z2 * 1.5);
+    dnaCtx.fillStyle = z2 > 0 ? dotColorAccent : dotColorMain; 
+    dnaCtx.globalAlpha = 0.3 + ((z2 + 1) / 2) * 0.7; 
+    dnaCtx.beginPath();
+    dnaCtx.arc(state2.x, state2.y, radius2, 0, Math.PI * 2);
+    dnaCtx.fill();
     
     dnaCtx.globalAlpha = 1.0; 
   }
@@ -387,5 +378,4 @@ function drawDNA() {
   requestAnimationFrame(drawDNA);
 }
 
-// Kick off the loop
 drawDNA();
