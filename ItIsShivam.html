@@ -3,86 +3,175 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shivam's Music Space</title>
+  <title>Souman Maity | Portfolio</title>
+  <!-- Updated to link your specific CSS file -->
   <link rel="stylesheet" href="ItIsShivam.css">
 </head>
 
 <body class="dark animated-bg">
-  <div class="main-container">
+  <div class="portfolio-layout">
 
-    <header>
-      <h1 id="title">Shivam's Music Space</h1>
-      <p id="subtitle">Music. Focus. Coffee.</p>
-    </header>
+    <!-- PORTFOLIO CONTENT (Left Side) -->
+    <main class="portfolio-content">
+      <section class="hero">
+        <h1>Hi, I'm Souman Maity.</h1>
+        <h2>Business Operations & Tech Enthusiast</h2>
+        <p>I aim to work and succeed in a stimulating and challenging environment, driving company success while exploring opportunities for advancement.</p>
+        <div class="hero-actions">
+          <a href="#experience" class="btn-primary">View Experience</a>
+          <a href="mailto:devsparadise999@duck.com" class="btn-dev">Contact Developer</a>
+        </div>
+      </section>
 
-    <div class="quote-box" id="quoteText">
-      Click Inspire to begin
-    </div>
+      <section id="experience" class="portfolio-section">
+        <h3>Professional Experience</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h4>Executive - Accounts and Sales Support</h4>
+            <h5>Amrete Healthcare (India) Pvt Ltd | March 2025 - August 2025</h5>
+            <ul>
+              <li>Managed end-to-end stock inventory, overseeing all product purchases and sales cycles.</li>
+              <li>Maintained accurate financial records by tracking and reporting all company expenses.</li>
+              <li>Balanced administrative accounting duties with active sales support to drive revenue.</li>
+            </ul>
+          </div>
+          <div class="timeline-item">
+            <h4>Chat Process Executive</h4>
+            <h5>24/7 ai | September 2024 - January 2025</h5>
+            <ul>
+              <li>Digital Interaction Advisor handling customer queries and providing sales support via chat.</li>
+              <li>Assisted in troubleshooting and resolving complex customer issues efficiently.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-    <div class="controls">
+      <section id="education" class="portfolio-section">
+        <h3>Education</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <h4>MBA (Pursuing)</h4>
+            <h5>TKRIMS</h5>
+          </div>
+          <div class="timeline-item">
+            <h4>B.COM (CA)</h4>
+            <h5>Osmania University | 2024 | Score: 7.6</h5>
+          </div>
+          <div class="timeline-item">
+            <h4>MPC</h4>
+            <h5>Narayana College | 2021 | Score: 618</h5>
+          </div>
+        </div>
+      </section>
 
-      <div class="row">
-        <button onclick="generateQuote()">Inspire</button>
-        <button onclick="togglePlay()">Play / Pause</button>
-        <button onclick="toggleTheme()">Theme</button>
+      <section id="skills" class="portfolio-section">
+        <h3>Skills & Tools</h3>
+        <div class="tags-container">
+          <span class="skill-tag">HTML & CSS</span>
+          <span class="skill-tag">Linux (Debian, Fedora, Arch)</span>
+          <span class="skill-tag">TALLY</span>
+          <span class="skill-tag">MS Office</span>
+          <span class="skill-tag">Libre Office</span>
+        </div>
+      </section>
+
+      <section id="interests" class="portfolio-section">
+        <h3>Interests & Languages</h3>
+        <div class="split-section">
+          <div>
+            <h4>Interests</h4>
+            <ul class="simple-list">
+              <li>Learning about Tech & Science</li>
+              <li>Listening to Music</li>
+              <li>Playing Video Games</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Languages</h4>
+            <ul class="simple-list">
+              <li>English</li>
+              <li>Hindi</li>
+              <li>Telugu</li>
+              <li>Bangla</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        Built with focus · 
+        <div class="powered-by">
+          Powered by <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a> & <a href="https://ncs.io/" target="_blank" rel="noopener noreferrer">NCS</a>
+        </div>
+      </footer>
+    </main>
+
+    <!-- MUSIC SPACE WIDGET (Right Side) -->
+    <aside class="music-widget">
+      <header>
+        <h2 id="title">Music Space</h2>
+        <p id="subtitle">Music. Focus. Code.</p>
+      </header>
+
+      <div class="quote-box" id="quoteText">
+        Click Inspire to begin
       </div>
 
-      <div class="row">
-        <label>Volume</label>
-        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+      <div class="controls">
+        <div class="row">
+          <button onclick="generateQuote()">Inspire</button>
+          <button onclick="togglePlay()">Play / Pause</button>
+          <button onclick="toggleTheme()">Theme</button>
+        </div>
+
+        <div class="row">
+          <label>Volume</label>
+          <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5">
+        </div>
+
+        <div class="row progress-row">
+          <span id="currentTime">0:00</span>
+          <input type="range" id="progress" min="0" max="100" value="0">
+          <span id="duration">0:00</span>
+        </div>
+
+        <div class="row">
+          <select id="visualizerMode">
+            <option value="bars">Color Bars</option>
+            <option value="wave">Wave Flow</option>
+            <option value="pulse">Pulse Glow</option>
+          </select>
+
+          <select id="quoteCategory">
+            <option value="all">All Quotes</option>
+            <option value="focus">Focus</option>
+            <option value="career">Career</option>
+            <option value="calm">Calm</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <select id="trackSelector">
+            <option value="mortals-funk-remix.mp3">Mortals (Funk Remix)</option>
+            <option value="on-and-on.mp3">On & On</option>
+            <option value="make-me-move.mp3">Make Me Move</option>
+            <option value="heroes-tonight.mp3">Heroes Tonight</option>
+            <option value="power.mp3">Power</option>
+            <option value="only-human.mp3">Only Human</option>
+            <option value="want-your-body.mp3">Want Your Body</option>
+            <option value="did-it-mean-forever.mp3">Did It Mean Forever</option>
+            <option value="digital-death.mp3">Digital Death</option>
+            <option value="all-i-need.mp3">All I Need</option>
+          </select>
+        </div>
       </div>
 
-      <div class="row progress-row">
-        <span id="currentTime">0:00</span>
-        <input type="range" id="progress" min="0" max="100" value="0">
-        <span id="duration">0:00</span>
-      </div>
+      <canvas id="visualizer"></canvas>
+    </aside>
 
-      <div class="row">
-        <select id="visualizerMode">
-          <option value="bars">Color Bars</option>
-          <option value="wave">Wave Flow</option>
-          <option value="pulse">Pulse Glow</option>
-        </select>
-
-        <select id="quoteCategory">
-          <option value="all">All Quotes</option>
-          <option value="focus">Focus</option>
-          <option value="life">Life</option>
-          <option value="calm">Calm</option>
-        </select>
-      </div>
-
-      <div class="row">
-        <select id="trackSelector">
-          <option value="mortals-funk-remix.mp3">Mortals (Funk Remix)</option>
-          <option value="on-and-on.mp3">On & On</option>
-          <option value="make-me-move.mp3">Make Me Move</option>
-          <option value="heroes-tonight.mp3">Heroes Tonight</option>
-          <option value="power.mp3">Power</option>
-          <option value="only-human.mp3">Only Human</option>
-          <option value="want-your-body.mp3">Want Your Body</option>
-          <option value="did-it-mean-forever.mp3">Did It Mean Forever</option>
-          <option value="digital-death.mp3">Digital Death</option>
-          <option value="all-i-need.mp3">All I Need</option>
-        </select>
-      </div>
-
-    </div>
-
-    <canvas id="visualizer"></canvas>
-
-    <footer class="site-footer">
-      Built with focus · 
-      <a href="mailto:devsparadise999@duck.com">Contact Developer</a>
-    </footer>
-
-  </div> <audio id="audio" preload="metadata"></audio>
-  <script src="ItIsShivam.js"></script>
-
-  <div class="powered-by">
-    Powered by <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub</a> & <a href="https://ncs.io/" target="_blank" rel="noopener noreferrer">NCS</a>
   </div>
 
+  <audio id="audio" preload="metadata"></audio>
+  <script src="ItIsShivam.js"></script>
 </body>
 </html>
