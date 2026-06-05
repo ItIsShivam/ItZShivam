@@ -294,7 +294,7 @@ canvas { width: 100%; height: 160px; border-radius: 16px; background: rgba(0,0,0
     gap: 40px; 
   }
   .music-widget { 
-    /* REMOVED order: -1 -> Pushes the widget safely to the bottom of the column */
+    order: -1; 
     position: relative; 
     top: 0; 
     padding: 25px 20px;
