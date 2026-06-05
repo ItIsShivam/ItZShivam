@@ -129,3 +129,28 @@ body.light select {
   font-size: 0.85em;
   opacity: 0.8;
 }
+
+/* --- Powered By Corner --- */
+.powered-by {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.powered-by:hover {
+  opacity: 1;
+}
+
+.powered-by a {
+  color: inherit; /* Adopts the dark/light theme color dynamically */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.powered-by a:hover {
+  text-decoration: underline;
+}
