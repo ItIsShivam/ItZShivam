@@ -198,17 +198,23 @@ window.addEventListener('scroll', () => {
 });
 
 function resizeDnaCanvas() {
-  dnaCanvas.width = window.innerWidth;
-  dnaCanvas.height = window.innerHeight;
+  const dpr = window.devicePixelRatio || 1;
+  dnaCanvas.width = window.innerWidth * dpr;
+  dnaCanvas.height = window.innerHeight * dpr;
+  dnaCtx.scale(dpr, dpr);
 }
 window.addEventListener('resize', resizeDnaCanvas);
-resizeDnaCanvas();
+resizeDnaCanvas(); // Initial call
 
 function drawDNA() {
-  dnaCtx.clearRect(0, 0, dnaCanvas.width, dnaCanvas.height);
+  // Use innerWidth/Height for logical coordinates
+  const w = window.innerWidth;
+  const h = window.innerHeight;
   
-  const centerY = dnaCanvas.height / 2;
-  const centerX = dnaCanvas.width / 2;
+  dnaCtx.clearRect(0, 0, w, h);
+  
+  const centerY = h / 2;
+  const centerX = w / 2;
   
   // Base rotation (auto) + Interactive Rotation (scroll)
   const time = Date.now() * 0.0003; 
@@ -222,13 +228,12 @@ function drawDNA() {
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
   const nodes = 70; // Number of base pairs
-  const isMobile = dnaCanvas.width < 768;
+  const isMobile = w < 768;
   const maxAmplitude = isMobile ? 80 : 180; // How wide the "roots" get
 
   for(let i = 0; i < nodes; i++) {
-    // 0 = top of screen, 1 = bottom of screen
     const progress = i / nodes; 
-    const y = (dnaCanvas.height * 0.05) + (progress * dnaCanvas.height * 0.9);
+    const y = (h * 0.05) + (progress * h * 0.9);
     
     // Tapering width: narrow at top, wide at bottom to look like a tree trunk -> roots
     const amplitude = 15 + Math.pow(progress, 1.8) * maxAmplitude; 
