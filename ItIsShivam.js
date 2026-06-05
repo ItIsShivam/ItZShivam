@@ -223,16 +223,37 @@ window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
 });
 
-// 1. Setup Mouse Tracking for Interactivity
-let mouse = { x: null, y: null, radius: 120 }; // Radius of the "magnetic" push
+// 1. Setup Tracking for Mouse and Touch Interactions
+let mouse = { x: null, y: null, radius: 150 }; 
+let isInteracting = false; // Tracks if the user is actively clicking/touching
 
+// Mouse Events
+window.addEventListener('mousedown', () => isInteracting = true);
+window.addEventListener('mouseup', () => isInteracting = false);
 window.addEventListener('mousemove', (e) => {
   mouse.x = e.x;
   mouse.y = e.y;
 });
-
 window.addEventListener('mouseout', () => {
-  // Prevent DNA from staying bent when cursor leaves the window
+  isInteracting = false;
+  mouse.x = null;
+  mouse.y = null;
+});
+
+// Touch Events (Mobile/Tablet Support)
+window.addEventListener('touchstart', (e) => {
+  isInteracting = true;
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: true });
+
+window.addEventListener('touchend', () => {
+  isInteracting = false;
   mouse.x = null;
   mouse.y = null;
 });
@@ -245,6 +266,19 @@ function resizeDnaCanvas() {
 }
 window.addEventListener('resize', resizeDnaCanvas);
 resizeDnaCanvas();
+
+// 2. Setup Spring Physics Arrays
+const nodes = 70;
+// We store a separate x/y offset (dx, dy) and velocity (vx, vy) for every single dot
+const particles = Array.from({ length: nodes }, () => ({
+  dx1: 0, dy1: 0, vx1: 0, vy1: 0,
+  dx2: 0, dy2: 0, vx2: 0, vy2: 0
+}));
+
+// Physics Tuners
+const SPRING = 0.05;   // Snap-back strength (Lower = looser, slower return)
+const FRICTION = 0.82; // Momentum damping (Higher = more bouncy/wobbly)
+const REPULSION = 18;  // Explosive push force when clicking/touching
 
 function drawDNA() {
   const w = window.innerWidth;
@@ -262,26 +296,40 @@ function drawDNA() {
   const dotColorAccent = '#ff9f43'; 
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
-  const nodes = 70; 
   const isMobile = w < 768;
   const maxAmplitude = isMobile ? 80 : 180; 
 
-  // 2. Physics Engine: Calculates how far to bend the DNA away from the cursor
-  function applyRepulsion(x, y) {
-    if (mouse.x === null || mouse.y === null) return { x, y };
-    
-    const dx = mouse.x - x;
-    const dy = mouse.y - y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // If the mouse is close to a DNA node, push it outward
-    if (distance < mouse.radius) {
-      const force = (mouse.radius - distance) / mouse.radius;
-      const pushX = (dx / distance) * force * 50; // 50px max push distance
-      const pushY = (dy / distance) * force * 50;
-      return { x: x - pushX, y: y - pushY };
+  // 3. Core Physics Function
+  function applyPhysics(rawX, rawY, dx, dy, vx, vy) {
+    // A. Apply spring tension (Pulls the offset back to 0)
+    vx -= dx * SPRING;
+    vy -= dy * SPRING;
+
+    // B. Apply breaking interaction if actively clicked/touched
+    if (isInteracting && mouse.x !== null && mouse.y !== null) {
+      const actualX = rawX + dx;
+      const actualY = rawY + dy;
+      const distX = mouse.x - actualX;
+      const distY = mouse.y - actualY;
+      const distance = Math.sqrt(distX * distX + distY * distY);
+      
+      if (distance < mouse.radius) {
+        const force = (mouse.radius - distance) / mouse.radius;
+        // Pushes the dot explosively outwards from the cursor
+        vx -= (distX / distance) * force * REPULSION;
+        vy -= (distY / distance) * force * REPULSION;
+      }
     }
-    return { x, y };
+
+    // C. Apply friction so they don't bounce forever
+    vx *= FRICTION;
+    vy *= FRICTION;
+
+    // D. Update final offset limits
+    dx += vx;
+    dy += vy;
+
+    return { dx, dy, vx, vy, x: rawX + dx, y: rawY + dy };
   }
 
   for(let i = 0; i < nodes; i++) {
@@ -290,25 +338,37 @@ function drawDNA() {
     const amplitude = 15 + Math.pow(progressVal, 1.8) * maxAmplitude; 
     const angle = (progressVal * Math.PI * 12) + totalRotation; 
 
-    // Base 3D Coordinates calculation
+    // Base coordinates
     const rawX1 = centerX + Math.cos(angle) * amplitude;
     const rawX2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
     const z1 = Math.sin(angle);
     const z2 = Math.sin(angle + Math.PI);
 
-    // 3. Apply the Physics: Stretch the nodes before drawing them
-    const p1 = applyRepulsion(rawX1, baseY);
-    const p2 = applyRepulsion(rawX2, baseY);
+    // Apply the physics simulation to this specific node pair
+    const p = particles[i];
+    
+    const state1 = applyPhysics(rawX1, baseY, p.dx1, p.dy1, p.vx1, p.vy1);
+    p.dx1 = state1.dx; p.dy1 = state1.dy; p.vx1 = state1.vx; p.vy1 = state1.vy;
+    
+    const state2 = applyPhysics(rawX2, baseY, p.dx2, p.dy2, p.vx2, p.vy2);
+    p.dx2 = state2.dx; p.dy2 = state2.dy; p.vx2 = state2.vx; p.vy2 = state2.vy;
 
-    // Draw the elastic connecting lines
+    // Visual detail: Fade out lines if the DNA is "broken" too far apart
+    const lineDist = Math.sqrt(Math.pow(state2.x - state1.x, 2) + Math.pow(state2.y - state1.y, 2));
+    const originalDist = Math.abs(rawX2 - rawX1); 
+    const stretchRatio = Math.max(0, 1 - (lineDist - originalDist) / 100);
+
+    // Draw connecting lines
     dnaCtx.beginPath();
-    dnaCtx.moveTo(p1.x, p1.y);
-    dnaCtx.lineTo(p2.x, p2.y);
+    dnaCtx.moveTo(state1.x, state1.y);
+    dnaCtx.lineTo(state2.x, state2.y);
     dnaCtx.strokeStyle = lineColor;
+    dnaCtx.globalAlpha = stretchRatio; // Fades out under strain
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
+    dnaCtx.globalAlpha = 1.0;
 
-    // Draw the 3D dots
+    // Draw 3D dots
     function drawDot(x, y, z, color1, color2) {
       const radius = 2 + z * 1.5; 
       dnaCtx.fillStyle = z > 0 ? color2 : color1; 
@@ -318,8 +378,8 @@ function drawDNA() {
       dnaCtx.fill();
     }
 
-    drawDot(p1.x, p1.y, z1, dotColorMain, dotColorAccent);
-    drawDot(p2.x, p2.y, z2, dotColorMain, dotColorAccent);
+    drawDot(state1.x, state1.y, z1, dotColorMain, dotColorAccent);
+    drawDot(state2.x, state2.y, z2, dotColorMain, dotColorAccent);
     
     dnaCtx.globalAlpha = 1.0; 
   }
@@ -329,4 +389,3 @@ function drawDNA() {
 
 // Kick off the loop
 drawDNA();
-                 
