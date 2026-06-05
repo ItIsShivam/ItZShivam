@@ -11,8 +11,32 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Dark Theme (Default) */
 body.dark { color: #ffffff; }
-body.light { color: #111; background: #f2f2f2; }
+body.dark.animated-bg {
+  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+  background-size: 300% 300%;
+  animation: bgMove 40s ease infinite;
+}
+
+/* Light Theme Fix */
+body.light { color: #111; }
+body.light.animated-bg {
+  background: linear-gradient(120deg, #fdfbfb, #e2ebf0, #fdfbfb);
+  background-size: 300% 300%;
+  animation: bgMove 40s ease infinite;
+}
+
+/* DNA Background Canvas */
+#dnaCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -5; /* Keeps it strictly behind all content */
+  pointer-events: none; /* Allows you to click through it */
+}
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 10px; }
@@ -20,13 +44,6 @@ body.light { color: #111; background: #f2f2f2; }
 ::-webkit-scrollbar-thumb { background: rgba(255, 159, 67, 0.6); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 159, 67, 0.9); }
 body.light ::-webkit-scrollbar-thumb { background: rgba(17, 17, 17, 0.3); }
-
-/* Animated background & Beat Overlay */
-body.animated-bg {
-  background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-  background-size: 300% 300%;
-  animation: bgMove 40s ease infinite;
-}
 
 @keyframes bgMove {
   0% { background-position: 0% 50%; }
@@ -68,11 +85,7 @@ body::before {
 }
 
 /* --- Left Side: Portfolio Content --- */
-.portfolio-content {
-  display: flex;
-  flex-direction: column;
-  gap: 60px;
-}
+.portfolio-content { display: flex; flex-direction: column; gap: 60px; }
 
 .hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 12px; line-height: 1.1; }
 .hero h2 { font-size: clamp(1.2rem, 2.5vw, 1.6rem); color: #ff9f43; margin-bottom: 25px; font-weight: 500; }
@@ -162,8 +175,9 @@ body.light .skill-tag { background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0
   display: flex;
   flex-direction: column;
   gap: 20px;
+  backdrop-filter: blur(5px);
 }
-body.light .os-card { background: rgba(0, 0, 0, 0.03); border: 1px solid rgba(0, 0, 0, 0.1); }
+body.light .os-card { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(0, 0, 0, 0.1); }
 
 .setup-img {
   width: 100%;
@@ -244,13 +258,7 @@ button {
 button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 122, 24, 0.4); }
 button:active { transform: translateY(0); }
 
-input[type="range"] { 
-  flex: 1; 
-  accent-color: #ff9f43; 
-  height: 6px; 
-  border-radius: 5px; 
-  cursor: pointer; 
-}
+input[type="range"] { flex: 1; accent-color: #ff9f43; height: 6px; border-radius: 5px; cursor: pointer; }
 .progress-row span { width: 45px; text-align: center; font-size: 0.85rem; font-family: monospace; font-weight: bold; }
 
 select { 
@@ -267,12 +275,7 @@ select {
 select:focus { border-color: #ff9f43; }
 body.light select { background: rgba(255,255,255,0.6); color: #111; border: 1px solid rgba(0,0,0,0.2); }
 
-canvas { 
-  width: 100%; 
-  height: 160px; 
-  border-radius: 16px; 
-  background: rgba(0,0,0,0.2); 
-}
+canvas { width: 100%; height: 160px; border-radius: 16px; background: rgba(0,0,0,0.2); }
 
 /* --- Mobile Responsiveness --- */
 @media (max-width: 1024px) {
@@ -282,12 +285,10 @@ canvas {
 @media (max-width: 950px) {
   .portfolio-layout { 
     display: flex;
-    flex-direction: column; /* Switches from Grid to Flex */
+    flex-direction: column; 
     padding: 25px 15px; 
     gap: 40px; 
   }
-  
-  /* Puts the Music Widget at the TOP on mobile devices */
   .music-widget { 
     order: -1; 
     position: relative; 
@@ -295,7 +296,6 @@ canvas {
     padding: 25px 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   }
-
   .split-section { grid-template-columns: 1fr; gap: 25px; }
   .hero-actions { justify-content: center; }
   .hero { text-align: center; }
