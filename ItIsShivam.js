@@ -12,27 +12,30 @@ const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
-/* Quotes by category */
+/* Upgraded Professional Quotes */
 const quotes = {
   all: [],
   focus: [
-    "Strong coffee. Clear mind.",
-    "Focus on what matters.",
-    "Consistency compounds."
+    "Deep work produces massive results.",
+    "Mastery is the byproduct of sustained concentration.",
+    "Where focus goes, energy flows.",
+    "Eliminate distractions. Elevate execution."
   ],
-  life: [
-    "Small steps add up.",
-    "Growth takes patience.",
-    "Direction matters more than speed."
+  career: [
+    "Value is created through solving hard problems.",
+    "Consistency compounds over time.",
+    "Continuous learning is the ultimate competitive advantage.",
+    "Great execution is the ultimate differentiator."
   ],
   calm: [
-    "Calm mind. Steady work.",
-    "Create space to think.",
-    "Silence builds clarity."
+    "Clarity comes from a quiet mind.",
+    "Embrace the process; detach from the immediate outcome.",
+    "A calm mind is a highly creative mind.",
+    "Patience in the macro, speed in the micro."
   ]
 };
 
-quotes.all = [...quotes.focus, ...quotes.life, ...quotes.calm];
+quotes.all = [...quotes.focus, ...quotes.career, ...quotes.calm];
 
 /* Audio setup */
 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -45,7 +48,6 @@ source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
 audio.src = trackSelector.value;
 
 /* Visualizer */
@@ -82,9 +84,11 @@ function draw() {
   if (visualizerMode.value === "wave") {
     ctx.beginPath();
     ctx.strokeStyle = `hsl(${hue},70%,60%)`;
+    ctx.lineWidth = 2;
     dataArray.forEach((v, i) => {
       const y = canvas.height / 2 + (v - 128);
-      ctx.lineTo(i * barWidth, y);
+      if (i === 0) ctx.moveTo(0, y);
+      else ctx.lineTo(i * barWidth, y);
     });
     ctx.stroke();
   }
@@ -92,15 +96,25 @@ function draw() {
   if (visualizerMode.value === "pulse") {
     ctx.fillStyle = `hsla(${hue},70%,60%,0.6)`;
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 30 + intensity * 80, 0, Math.PI * 2);
+    ctx.arc(canvas.width / 2, canvas.height / 2, 20 + intensity * 60, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
+/* Canvas Resize Handler */
+function resizeCanvas() {
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
 /* Controls */
 function togglePlay() {
   if (!isPlaying) {
-    audioCtx.resume();
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
     audio.play();
     draw();
     isPlaying = true;
@@ -122,14 +136,16 @@ volume.addEventListener("input", () => {
 function generateQuote() {
   const cat = quoteCategory.value;
   const list = quotes[cat];
-  quoteText.textContent = list[Math.floor(Math.random() * list.length)];
+  quoteText.textContent = `"${list[Math.floor(Math.random() * list.length)]}"`;
 }
 
 /* Progress */
 audio.addEventListener("timeupdate", () => {
-  progress.value = (audio.currentTime / audio.duration) * 100 || 0;
-  currentTimeEl.textContent = format(audio.currentTime);
-  durationEl.textContent = format(audio.duration);
+  if (!isNaN(audio.duration)) {
+    progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+    currentTimeEl.textContent = format(audio.currentTime);
+    durationEl.textContent = format(audio.duration);
+  }
 });
 
 progress.addEventListener("input", () => {
@@ -150,8 +166,11 @@ trackSelector.addEventListener("change", () => {
 });
 
 function format(sec) {
-  if (!sec) return "0:00";
+  if (!sec || isNaN(sec)) return "0:00";
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
+
+// Generate an initial quote on load
+generateQuote();
