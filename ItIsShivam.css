@@ -34,8 +34,19 @@ body.light.animated-bg {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -5; /* Keeps it strictly behind all content */
+  z-index: 0; /* Sits directly above the body's background color */
   pointer-events: none; /* Allows you to click through it */
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--beat-bg, transparent);
+  opacity: var(--beat-opacity, 0);
+  transition: opacity 0.15s ease-out;
+  pointer-events: none;
+  z-index: 1; /* Beat overlay flashes right above the DNA */
 }
 
 /* Custom Scrollbar */
@@ -49,17 +60,6 @@ body.light ::-webkit-scrollbar-thumb { background: rgba(17, 17, 17, 0.3); }
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: var(--beat-bg, transparent);
-  opacity: var(--beat-opacity, 0);
-  transition: opacity 0.15s ease-out;
-  pointer-events: none;
-  z-index: -1;
 }
 
 /* Animations */
@@ -82,6 +82,8 @@ body::before {
   margin: 0 auto;
   padding: 50px 30px;
   align-items: start;
+  position: relative;
+  z-index: 10; /* Ensures all text and cards sit ABOVE the background and DNA */
 }
 
 /* --- Left Side: Portfolio Content --- */
