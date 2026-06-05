@@ -12,6 +12,9 @@ const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
+/* Set Current Year in Footer */
+document.getElementById('year').textContent = new Date().getFullYear();
+
 /* Upgraded Professional Quotes */
 const quotes = {
   all: [],
@@ -50,11 +53,34 @@ analyser.connect(audioCtx.destination);
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 audio.src = trackSelector.value;
 
+/* High DPI Canvas Setup (Fixes blurriness on mobile/Mac) */
+function resizeCanvas() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  
+  ctx.scale(dpr, dpr);
+}
+
+window.addEventListener('resize', () => {
+  requestAnimationFrame(resizeCanvas);
+});
+resizeCanvas(); // Initialize on load
+
 /* Visualizer */
 function draw() {
+  if (!isPlaying) return; // Save processing power when paused
   requestAnimationFrame(draw);
+  
   analyser.getByteFrequencyData(dataArray);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
+  
+  ctx.clearRect(0, 0, w, h);
 
   let bass = 0;
   const bassEnd = dataArray.length * 0.25;
@@ -72,21 +98,23 @@ function draw() {
   );
   document.body.style.setProperty("--beat-opacity", intensity);
 
-  const barWidth = canvas.width / dataArray.length;
+  const barWidth = w / dataArray.length;
 
   if (visualizerMode.value === "bars") {
     dataArray.forEach((v, i) => {
       ctx.fillStyle = `hsl(${hue + i},60%,55%)`;
-      ctx.fillRect(i * barWidth, canvas.height - v / 2, barWidth - 2, v / 2);
+      // Scale visualizer relative to canvas height
+      const barHeight = (v / 255) * h * 0.8; 
+      ctx.fillRect(i * barWidth, h - barHeight, barWidth - 2, barHeight);
     });
   }
 
   if (visualizerMode.value === "wave") {
     ctx.beginPath();
     ctx.strokeStyle = `hsl(${hue},70%,60%)`;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 3;
     dataArray.forEach((v, i) => {
-      const y = canvas.height / 2 + (v - 128);
+      const y = h / 2 + ((v - 128) / 128) * (h / 2);
       if (i === 0) ctx.moveTo(0, y);
       else ctx.lineTo(i * barWidth, y);
     });
@@ -96,31 +124,28 @@ function draw() {
   if (visualizerMode.value === "pulse") {
     ctx.fillStyle = `hsla(${hue},70%,60%,0.6)`;
     ctx.beginPath();
-    ctx.arc(canvas.width / 2, canvas.height / 2, 20 + intensity * 60, 0, Math.PI * 2);
+    ctx.arc(w / 2, h / 2, 20 + intensity * Math.min(w, h) * 0.3, 0, Math.PI * 2);
     ctx.fill();
   }
 }
 
-/* Canvas Resize Handler */
-function resizeCanvas() {
-  canvas.width = canvas.clientWidth;
-  canvas.height = canvas.clientHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
 /* Controls */
 function togglePlay() {
+  const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
     if (audioCtx.state === 'suspended') {
       audioCtx.resume();
     }
     audio.play();
-    draw();
     isPlaying = true;
+    playBtn.textContent = "Pause";
+    draw(); // Kick off animation loop
   } else {
     audio.pause();
     isPlaying = false;
+    playBtn.textContent = "Play";
+    // Fade out beat background
+    document.body.style.setProperty("--beat-opacity", 0);
   }
 }
 
@@ -136,8 +161,15 @@ volume.addEventListener("input", () => {
 function generateQuote() {
   const cat = quoteCategory.value;
   const list = quotes[cat];
-  quoteText.textContent = `"${list[Math.floor(Math.random() * list.length)]}"`;
+  
+  // Quick fade animation for quote transition
+  quoteText.style.opacity = 0;
+  setTimeout(() => {
+    quoteText.textContent = `"${list[Math.floor(Math.random() * list.length)]}"`;
+    quoteText.style.opacity = 1;
+  }, 200);
 }
+quoteText.style.transition = "opacity 0.2s ease";
 
 /* Progress */
 audio.addEventListener("timeupdate", () => {
@@ -152,18 +184,24 @@ progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* Autoplay next */
+/* Autoplay next & Track Selection */
+function playSelectedTrack() {
+  audio.src = trackSelector.value;
+  progress.value = 0;
+  currentTimeEl.textContent = "0:00";
+  if (isPlaying) {
+    audio.play();
+  }
+}
+
 audio.addEventListener("ended", () => {
   trackSelector.selectedIndex =
     (trackSelector.selectedIndex + 1) % trackSelector.options.length;
-  audio.src = trackSelector.value;
-  audio.play();
+  playSelectedTrack();
+  if (!isPlaying) togglePlay(); // Ensure it starts playing if it was somehow paused
 });
 
-trackSelector.addEventListener("change", () => {
-  audio.src = trackSelector.value;
-  if (isPlaying) audio.play();
-});
+trackSelector.addEventListener("change", playSelectedTrack);
 
 function format(sec) {
   if (!sec || isNaN(sec)) return "0:00";
