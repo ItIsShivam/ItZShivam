@@ -1,4 +1,4 @@
-// ====== IMMEDIATE THEME LOADING (Prevents page flash) ======
+// ====== IMMEDIATE THEME LOADING (Prevents light mode screen flash) ======
 const savedTheme = localStorage.getItem("theme") || "dark";
 if (savedTheme === "light") {
   document.body.classList.add("light");
@@ -23,7 +23,7 @@ const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
-// Audio processing nodes (Initialized on-demand to bypass browser warnings)
+// Web Audio Processing pipelines (Initialized purely on-demand)
 let audioCtx = null;
 let source = null;
 let analyser = null;
@@ -32,7 +32,7 @@ let dataArray = null;
 /* Set Current Year in Footer */
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* Professional Quotes System */
+/* Professional Quotes Matrix */
 const quotes = {
   all: [],
   focus: [
@@ -56,15 +56,15 @@ const quotes = {
 };
 quotes.all = [...quotes.focus, ...quotes.career, ...quotes.calm];
 
-// Set initial track source on load
+// Bind baseline media value
 audio.src = trackSelector.value;
 
 /**
- * Lazy Initializer for the Web Audio Context
- * Defers context assembly until active user gesture interaction
+ * Lazy Initializer for Web Audio Engine
+ * Defers instantiation until real physical user gesture to pass browser policy locks
  */
 function initAudioContext() {
-  if (audioCtx) return; // Prevent duplicate instantiation
+  if (audioCtx) return; 
 
   const AudioContextClass = window.AudioContext || window.webkitAudioContext;
   audioCtx = new AudioContextClass();
@@ -78,7 +78,7 @@ function initAudioContext() {
   dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-/* High DPI Canvas Setup */
+/* High DPI Canvas Scaling Controller */
 function resizeCanvas() {
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
@@ -89,7 +89,7 @@ function resizeCanvas() {
 window.addEventListener('resize', () => { requestAnimationFrame(resizeCanvas); });
 resizeCanvas();
 
-/* Visualizer Rendering Loop */
+/* Audio Reactive Engine Loop */
 function draw() {
   if (!isPlaying || !analyser) return;
   requestAnimationFrame(draw);
@@ -138,12 +138,11 @@ function draw() {
   }
 }
 
-/* Core Interface Actions */
+/* UI Action Hooks */
 function togglePlay() {
   const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
-    // Fire the lazy audio pipeline initialization cleanly on user interaction
-    initAudioContext();
+    initAudioContext(); // Instantiates nodes seamlessly on execution gesture
     
     if (audioCtx.state === 'suspended') audioCtx.resume();
     audio.play();
@@ -162,9 +161,8 @@ function toggleTheme() {
   document.body.classList.toggle("light");
   document.body.classList.toggle("dark");
   
-  // Persist the choice to local memory storage
-  const activeTheme = document.body.classList.contains("light") ? "light" : "dark";
-  localStorage.setItem("theme", activeTheme);
+  const currentMode = document.body.classList.contains("light") ? "light" : "dark";
+  localStorage.setItem("theme", currentMode);
 }
 
 volume.addEventListener("input", () => { audio.volume = volume.value; });
@@ -180,7 +178,7 @@ function generateQuote() {
 }
 quoteText.style.transition = "opacity 0.2s ease";
 
-/* System Playback Event Syncing */
+/* Dynamic Media Events mapping */
 audio.addEventListener("timeupdate", () => {
   if (!isNaN(audio.duration)) {
     progress.value = (audio.currentTime / audio.duration) * 100 || 0;
@@ -216,7 +214,7 @@ function format(sec) {
 
 generateQuote();
 
-// ====== DYNAMIC DISSOLVING DNA TREE BACKGROUND ======
+// ====== BACKGROUND CANVAS: GEOMETRIC 3D DNA MATRIX SYSTEM ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
@@ -240,9 +238,7 @@ function drawDNA() {
   
   dnaCtx.clearRect(0, 0, w, h);
   
-  const centerY = h / 2;
   const centerX = w / 2;
-  
   const time = Date.now() * 0.0003; 
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
@@ -293,5 +289,4 @@ function drawDNA() {
   requestAnimationFrame(drawDNA);
 }
 
-// Kick off background animation loop
 drawDNA();
