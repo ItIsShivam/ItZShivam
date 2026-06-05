@@ -214,13 +214,27 @@ function format(sec) {
 
 generateQuote();
 
-// ====== BACKGROUND CANVAS: GEOMETRIC 3D DNA MATRIX SYSTEM ======
+// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
 let scrollPos = 0;
 window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
+});
+
+// 1. Setup Mouse Tracking for Interactivity
+let mouse = { x: null, y: null, radius: 120 }; // Radius of the "magnetic" push
+
+window.addEventListener('mousemove', (e) => {
+  mouse.x = e.x;
+  mouse.y = e.y;
+});
+
+window.addEventListener('mouseout', () => {
+  // Prevent DNA from staying bent when cursor leaves the window
+  mouse.x = null;
+  mouse.y = null;
 });
 
 function resizeDnaCanvas() {
@@ -252,25 +266,49 @@ function drawDNA() {
   const isMobile = w < 768;
   const maxAmplitude = isMobile ? 80 : 180; 
 
+  // 2. Physics Engine: Calculates how far to bend the DNA away from the cursor
+  function applyRepulsion(x, y) {
+    if (mouse.x === null || mouse.y === null) return { x, y };
+    
+    const dx = mouse.x - x;
+    const dy = mouse.y - y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // If the mouse is close to a DNA node, push it outward
+    if (distance < mouse.radius) {
+      const force = (mouse.radius - distance) / mouse.radius;
+      const pushX = (dx / distance) * force * 50; // 50px max push distance
+      const pushY = (dy / distance) * force * 50;
+      return { x: x - pushX, y: y - pushY };
+    }
+    return { x, y };
+  }
+
   for(let i = 0; i < nodes; i++) {
     const progressVal = i / nodes; 
-    const y = (h * 0.05) + (progressVal * h * 0.9);
+    const baseY = (h * 0.05) + (progressVal * h * 0.9);
     const amplitude = 15 + Math.pow(progressVal, 1.8) * maxAmplitude; 
     const angle = (progressVal * Math.PI * 12) + totalRotation; 
 
-    const x1 = centerX + Math.cos(angle) * amplitude;
-    const x2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
-    
+    // Base 3D Coordinates calculation
+    const rawX1 = centerX + Math.cos(angle) * amplitude;
+    const rawX2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
     const z1 = Math.sin(angle);
     const z2 = Math.sin(angle + Math.PI);
 
+    // 3. Apply the Physics: Stretch the nodes before drawing them
+    const p1 = applyRepulsion(rawX1, baseY);
+    const p2 = applyRepulsion(rawX2, baseY);
+
+    // Draw the elastic connecting lines
     dnaCtx.beginPath();
-    dnaCtx.moveTo(x1, y);
-    dnaCtx.lineTo(x2, y);
+    dnaCtx.moveTo(p1.x, p1.y);
+    dnaCtx.lineTo(p2.x, p2.y);
     dnaCtx.strokeStyle = lineColor;
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
 
+    // Draw the 3D dots
     function drawDot(x, y, z, color1, color2) {
       const radius = 2 + z * 1.5; 
       dnaCtx.fillStyle = z > 0 ? color2 : color1; 
@@ -280,8 +318,8 @@ function drawDNA() {
       dnaCtx.fill();
     }
 
-    drawDot(x1, y, z1, dotColorMain, dotColorAccent);
-    drawDot(x2, y, z2, dotColorMain, dotColorAccent);
+    drawDot(p1.x, p1.y, z1, dotColorMain, dotColorAccent);
+    drawDot(p2.x, p2.y, z2, dotColorMain, dotColorAccent);
     
     dnaCtx.globalAlpha = 1.0; 
   }
@@ -289,4 +327,6 @@ function drawDNA() {
   requestAnimationFrame(drawDNA);
 }
 
+// Kick off the loop
 drawDNA();
+                 
