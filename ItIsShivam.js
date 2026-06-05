@@ -1,4 +1,14 @@
-// ====== AUDIO & UI CONTROLS ======
+// ====== IMMEDIATE THEME LOADING (Prevents page flash) ======
+const savedTheme = localStorage.getItem("theme") || "dark";
+if (savedTheme === "light") {
+  document.body.classList.add("light");
+  document.body.classList.remove("dark");
+} else {
+  document.body.classList.add("dark");
+  document.body.classList.remove("light");
+}
+
+// ====== AUDIO & UI CONTROLS ELEMENT MAPPING ======
 const audio = document.getElementById("audio");
 const volume = document.getElementById("volume");
 const progress = document.getElementById("progress");
@@ -13,10 +23,16 @@ const ctx = canvas.getContext("2d");
 
 let isPlaying = false;
 
+// Audio processing nodes (Initialized on-demand to bypass browser warnings)
+let audioCtx = null;
+let source = null;
+let analyser = null;
+let dataArray = null;
+
 /* Set Current Year in Footer */
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* Professional Quotes */
+/* Professional Quotes System */
 const quotes = {
   all: [],
   focus: [
@@ -38,21 +54,29 @@ const quotes = {
     "Patience in the macro, speed in the micro."
   ]
 };
-
 quotes.all = [...quotes.focus, ...quotes.career, ...quotes.calm];
 
-/* Audio setup */
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
-const source = audioCtx.createMediaElementSource(audio);
-const analyser = audioCtx.createAnalyser();
-
-analyser.fftSize = 128;
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-const dataArray = new Uint8Array(analyser.frequencyBinCount);
+// Set initial track source on load
 audio.src = trackSelector.value;
+
+/**
+ * Lazy Initializer for the Web Audio Context
+ * Defers context assembly until active user gesture interaction
+ */
+function initAudioContext() {
+  if (audioCtx) return; // Prevent duplicate instantiation
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new AudioContextClass();
+  source = audioCtx.createMediaElementSource(audio);
+  analyser = audioCtx.createAnalyser();
+
+  analyser.fftSize = 128;
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  dataArray = new Uint8Array(analyser.frequencyBinCount);
+}
 
 /* High DPI Canvas Setup */
 function resizeCanvas() {
@@ -65,9 +89,9 @@ function resizeCanvas() {
 window.addEventListener('resize', () => { requestAnimationFrame(resizeCanvas); });
 resizeCanvas();
 
-/* Visualizer */
+/* Visualizer Rendering Loop */
 function draw() {
-  if (!isPlaying) return;
+  if (!isPlaying || !analyser) return;
   requestAnimationFrame(draw);
   
   analyser.getByteFrequencyData(dataArray);
@@ -114,10 +138,13 @@ function draw() {
   }
 }
 
-/* Controls */
+/* Core Interface Actions */
 function togglePlay() {
   const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
+    // Fire the lazy audio pipeline initialization cleanly on user interaction
+    initAudioContext();
+    
     if (audioCtx.state === 'suspended') audioCtx.resume();
     audio.play();
     isPlaying = true;
@@ -134,6 +161,10 @@ function togglePlay() {
 function toggleTheme() {
   document.body.classList.toggle("light");
   document.body.classList.toggle("dark");
+  
+  // Persist the choice to local memory storage
+  const activeTheme = document.body.classList.contains("light") ? "light" : "dark";
+  localStorage.setItem("theme", activeTheme);
 }
 
 volume.addEventListener("input", () => { audio.volume = volume.value; });
@@ -149,7 +180,7 @@ function generateQuote() {
 }
 quoteText.style.transition = "opacity 0.2s ease";
 
-/* Progress & Tracking */
+/* System Playback Event Syncing */
 audio.addEventListener("timeupdate", () => {
   if (!isNaN(audio.duration)) {
     progress.value = (audio.currentTime / audio.duration) * 100 || 0;
@@ -185,14 +216,11 @@ function format(sec) {
 
 generateQuote();
 
-
-// ====== NEW: DYNAMIC DNA TREE BACKGROUND ======
+// ====== DYNAMIC DISSOLVING DNA TREE BACKGROUND ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
 let scrollPos = 0;
-
-// Track scrolling to spin the tree
 window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
 });
@@ -204,10 +232,9 @@ function resizeDnaCanvas() {
   dnaCtx.scale(dpr, dpr);
 }
 window.addEventListener('resize', resizeDnaCanvas);
-resizeDnaCanvas(); // Initial call
+resizeDnaCanvas();
 
 function drawDNA() {
-  // Use innerWidth/Height for logical coordinates
   const w = window.innerWidth;
   const h = window.innerHeight;
   
@@ -216,39 +243,31 @@ function drawDNA() {
   const centerY = h / 2;
   const centerX = w / 2;
   
-  // Base rotation (auto) + Interactive Rotation (scroll)
   const time = Date.now() * 0.0003; 
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
 
-  // Check Theme for Colors
   const isLightMode = document.body.classList.contains('light');
   const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
-  const dotColorAccent = '#ff9f43'; // Orange accent
+  const dotColorAccent = '#ff9f43'; 
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
-  const nodes = 70; // Number of base pairs
+  const nodes = 70; 
   const isMobile = w < 768;
-  const maxAmplitude = isMobile ? 80 : 180; // How wide the "roots" get
+  const maxAmplitude = isMobile ? 80 : 180; 
 
   for(let i = 0; i < nodes; i++) {
-    const progress = i / nodes; 
-    const y = (h * 0.05) + (progress * h * 0.9);
-    
-    // Tapering width: narrow at top, wide at bottom to look like a tree trunk -> roots
-    const amplitude = 15 + Math.pow(progress, 1.8) * maxAmplitude; 
-    
-    // Twisting angle
-    const angle = (progress * Math.PI * 12) + totalRotation; 
+    const progressVal = i / nodes; 
+    const y = (h * 0.05) + (progressVal * h * 0.9);
+    const amplitude = 15 + Math.pow(progressVal, 1.8) * maxAmplitude; 
+    const angle = (progressVal * Math.PI * 12) + totalRotation; 
 
-    // 3D projection math
     const x1 = centerX + Math.cos(angle) * amplitude;
     const x2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
     
     const z1 = Math.sin(angle);
     const z2 = Math.sin(angle + Math.PI);
 
-    // Draw connecting "base pair" lines
     dnaCtx.beginPath();
     dnaCtx.moveTo(x1, y);
     dnaCtx.lineTo(x2, y);
@@ -256,11 +275,10 @@ function drawDNA() {
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
 
-    // Draw nodes (dots) - changing colors based on depth (z) to simulate 3D
     function drawDot(x, y, z, color1, color2) {
-      const radius = 2 + z * 1.5; // Dots in front are larger
-      dnaCtx.fillStyle = z > 0 ? color2 : color1; // Dots in front get accent color
-      dnaCtx.globalAlpha = 0.3 + ((z + 1) / 2) * 0.7; // Dots in back are faded
+      const radius = 2 + z * 1.5; 
+      dnaCtx.fillStyle = z > 0 ? color2 : color1; 
+      dnaCtx.globalAlpha = 0.3 + ((z + 1) / 2) * 0.7; 
       dnaCtx.beginPath();
       dnaCtx.arc(x, y, Math.max(0.1, radius), 0, Math.PI * 2);
       dnaCtx.fill();
@@ -269,11 +287,11 @@ function drawDNA() {
     drawDot(x1, y, z1, dotColorMain, dotColorAccent);
     drawDot(x2, y, z2, dotColorMain, dotColorAccent);
     
-    dnaCtx.globalAlpha = 1.0; // Reset alpha
+    dnaCtx.globalAlpha = 1.0; 
   }
   
   requestAnimationFrame(drawDNA);
 }
 
-// Start DNA Animation
+// Kick off background animation loop
 drawDNA();
