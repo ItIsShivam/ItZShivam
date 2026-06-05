@@ -1,3 +1,4 @@
+// ====== AUDIO & UI CONTROLS ======
 const audio = document.getElementById("audio");
 const volume = document.getElementById("volume");
 const progress = document.getElementById("progress");
@@ -15,7 +16,7 @@ let isPlaying = false;
 /* Set Current Year in Footer */
 document.getElementById('year').textContent = new Date().getFullYear();
 
-/* Upgraded Professional Quotes */
+/* Professional Quotes */
 const quotes = {
   all: [],
   focus: [
@@ -53,41 +54,31 @@ analyser.connect(audioCtx.destination);
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
 audio.src = trackSelector.value;
 
-/* High DPI Canvas Setup (Fixes blurriness on mobile/Mac) */
+/* High DPI Canvas Setup */
 function resizeCanvas() {
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-  
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
-  
   ctx.scale(dpr, dpr);
 }
-
-window.addEventListener('resize', () => {
-  requestAnimationFrame(resizeCanvas);
-});
-resizeCanvas(); // Initialize on load
+window.addEventListener('resize', () => { requestAnimationFrame(resizeCanvas); });
+resizeCanvas();
 
 /* Visualizer */
 function draw() {
-  if (!isPlaying) return; // Save processing power when paused
+  if (!isPlaying) return;
   requestAnimationFrame(draw);
   
   analyser.getByteFrequencyData(dataArray);
-  
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
   const h = rect.height;
-  
   ctx.clearRect(0, 0, w, h);
 
   let bass = 0;
   const bassEnd = dataArray.length * 0.25;
-
-  dataArray.forEach((v, i) => {
-    if (i < bassEnd) bass += v;
-  });
+  dataArray.forEach((v, i) => { if (i < bassEnd) bass += v; });
 
   const intensity = bass / bassEnd / 255;
   const hue = 180 + intensity * 120;
@@ -103,25 +94,19 @@ function draw() {
   if (visualizerMode.value === "bars") {
     dataArray.forEach((v, i) => {
       ctx.fillStyle = `hsl(${hue + i},60%,55%)`;
-      // Scale visualizer relative to canvas height
       const barHeight = (v / 255) * h * 0.8; 
       ctx.fillRect(i * barWidth, h - barHeight, barWidth - 2, barHeight);
     });
-  }
-
-  if (visualizerMode.value === "wave") {
+  } else if (visualizerMode.value === "wave") {
     ctx.beginPath();
     ctx.strokeStyle = `hsl(${hue},70%,60%)`;
     ctx.lineWidth = 3;
     dataArray.forEach((v, i) => {
       const y = h / 2 + ((v - 128) / 128) * (h / 2);
-      if (i === 0) ctx.moveTo(0, y);
-      else ctx.lineTo(i * barWidth, y);
+      if (i === 0) ctx.moveTo(0, y); else ctx.lineTo(i * barWidth, y);
     });
     ctx.stroke();
-  }
-
-  if (visualizerMode.value === "pulse") {
+  } else if (visualizerMode.value === "pulse") {
     ctx.fillStyle = `hsla(${hue},70%,60%,0.6)`;
     ctx.beginPath();
     ctx.arc(w / 2, h / 2, 20 + intensity * Math.min(w, h) * 0.3, 0, Math.PI * 2);
@@ -133,18 +118,15 @@ function draw() {
 function togglePlay() {
   const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     audio.play();
     isPlaying = true;
     playBtn.textContent = "Pause";
-    draw(); // Kick off animation loop
+    draw();
   } else {
     audio.pause();
     isPlaying = false;
     playBtn.textContent = "Play";
-    // Fade out beat background
     document.body.style.setProperty("--beat-opacity", 0);
   }
 }
@@ -154,15 +136,11 @@ function toggleTheme() {
   document.body.classList.toggle("dark");
 }
 
-volume.addEventListener("input", () => {
-  audio.volume = volume.value;
-});
+volume.addEventListener("input", () => { audio.volume = volume.value; });
 
 function generateQuote() {
   const cat = quoteCategory.value;
   const list = quotes[cat];
-  
-  // Quick fade animation for quote transition
   quoteText.style.opacity = 0;
   setTimeout(() => {
     quoteText.textContent = `"${list[Math.floor(Math.random() * list.length)]}"`;
@@ -171,7 +149,7 @@ function generateQuote() {
 }
 quoteText.style.transition = "opacity 0.2s ease";
 
-/* Progress */
+/* Progress & Tracking */
 audio.addEventListener("timeupdate", () => {
   if (!isNaN(audio.duration)) {
     progress.value = (audio.currentTime / audio.duration) * 100 || 0;
@@ -184,23 +162,18 @@ progress.addEventListener("input", () => {
   audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-/* Autoplay next & Track Selection */
 function playSelectedTrack() {
   audio.src = trackSelector.value;
   progress.value = 0;
   currentTimeEl.textContent = "0:00";
-  if (isPlaying) {
-    audio.play();
-  }
+  if (isPlaying) audio.play();
 }
 
 audio.addEventListener("ended", () => {
-  trackSelector.selectedIndex =
-    (trackSelector.selectedIndex + 1) % trackSelector.options.length;
+  trackSelector.selectedIndex = (trackSelector.selectedIndex + 1) % trackSelector.options.length;
   playSelectedTrack();
-  if (!isPlaying) togglePlay(); // Ensure it starts playing if it was somehow paused
+  if (!isPlaying) togglePlay(); 
 });
-
 trackSelector.addEventListener("change", playSelectedTrack);
 
 function format(sec) {
@@ -210,5 +183,92 @@ function format(sec) {
   return `${m}:${s}`;
 }
 
-// Generate an initial quote on load
 generateQuote();
+
+
+// ====== NEW: DYNAMIC DNA TREE BACKGROUND ======
+const dnaCanvas = document.getElementById('dnaCanvas');
+const dnaCtx = dnaCanvas.getContext('2d');
+
+let scrollPos = 0;
+
+// Track scrolling to spin the tree
+window.addEventListener('scroll', () => {
+  scrollPos = window.scrollY;
+});
+
+function resizeDnaCanvas() {
+  dnaCanvas.width = window.innerWidth;
+  dnaCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeDnaCanvas);
+resizeDnaCanvas();
+
+function drawDNA() {
+  dnaCtx.clearRect(0, 0, dnaCanvas.width, dnaCanvas.height);
+  
+  const centerY = dnaCanvas.height / 2;
+  const centerX = dnaCanvas.width / 2;
+  
+  // Base rotation (auto) + Interactive Rotation (scroll)
+  const time = Date.now() * 0.0003; 
+  const scrollRotation = scrollPos * 0.004; 
+  const totalRotation = time + scrollRotation;
+
+  // Check Theme for Colors
+  const isLightMode = document.body.classList.contains('light');
+  const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
+  const dotColorAccent = '#ff9f43'; // Orange accent
+  const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+
+  const nodes = 70; // Number of base pairs
+  const isMobile = dnaCanvas.width < 768;
+  const maxAmplitude = isMobile ? 80 : 180; // How wide the "roots" get
+
+  for(let i = 0; i < nodes; i++) {
+    // 0 = top of screen, 1 = bottom of screen
+    const progress = i / nodes; 
+    const y = (dnaCanvas.height * 0.05) + (progress * dnaCanvas.height * 0.9);
+    
+    // Tapering width: narrow at top, wide at bottom to look like a tree trunk -> roots
+    const amplitude = 15 + Math.pow(progress, 1.8) * maxAmplitude; 
+    
+    // Twisting angle
+    const angle = (progress * Math.PI * 12) + totalRotation; 
+
+    // 3D projection math
+    const x1 = centerX + Math.cos(angle) * amplitude;
+    const x2 = centerX + Math.cos(angle + Math.PI) * amplitude; 
+    
+    const z1 = Math.sin(angle);
+    const z2 = Math.sin(angle + Math.PI);
+
+    // Draw connecting "base pair" lines
+    dnaCtx.beginPath();
+    dnaCtx.moveTo(x1, y);
+    dnaCtx.lineTo(x2, y);
+    dnaCtx.strokeStyle = lineColor;
+    dnaCtx.lineWidth = 1;
+    dnaCtx.stroke();
+
+    // Draw nodes (dots) - changing colors based on depth (z) to simulate 3D
+    function drawDot(x, y, z, color1, color2) {
+      const radius = 2 + z * 1.5; // Dots in front are larger
+      dnaCtx.fillStyle = z > 0 ? color2 : color1; // Dots in front get accent color
+      dnaCtx.globalAlpha = 0.3 + ((z + 1) / 2) * 0.7; // Dots in back are faded
+      dnaCtx.beginPath();
+      dnaCtx.arc(x, y, Math.max(0.1, radius), 0, Math.PI * 2);
+      dnaCtx.fill();
+    }
+
+    drawDot(x1, y, z1, dotColorMain, dotColorAccent);
+    drawDot(x2, y, z2, dotColorMain, dotColorAccent);
+    
+    dnaCtx.globalAlpha = 1.0; // Reset alpha
+  }
+  
+  requestAnimationFrame(drawDNA);
+}
+
+// Start DNA Animation
+drawDNA();
