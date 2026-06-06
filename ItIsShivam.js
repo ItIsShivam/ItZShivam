@@ -227,8 +227,12 @@ const INTERACTION_RADIUS = 150;
 window.addEventListener('mousemove', (e) => {
   activePointers = [{ x: e.clientX, y: e.clientY }];
 });
-window.addEventListener('mouseout', () => {
-  activePointers = []; // Empties array, triggers natural spring recovery
+
+// BUG FIX: document.mouseleave prevents bubbling wipes. 
+// It ONLY fires when the cursor completely leaves the website window,
+// keeping the repulsion effect perfectly intact while scrolling!
+document.addEventListener('mouseleave', () => {
+  activePointers = []; 
 });
 
 // Multi-Touch Listeners
