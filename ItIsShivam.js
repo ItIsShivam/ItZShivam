@@ -210,7 +210,7 @@ function format(sec) {
 
 generateQuote();
 
-// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (MULTI-TOUCH) ======
+// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (MULTI-TOUCH & DIGITAL LEAVES) ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
@@ -228,9 +228,6 @@ window.addEventListener('mousemove', (e) => {
   activePointers = [{ x: e.clientX, y: e.clientY }];
 });
 
-// BUG FIX: document.mouseleave prevents bubbling wipes. 
-// It ONLY fires when the cursor completely leaves the website window,
-// keeping the repulsion effect perfectly intact while scrolling!
 document.addEventListener('mouseleave', () => {
   activePointers = []; 
 });
@@ -251,13 +248,23 @@ window.addEventListener('touchmove', updateTouches, { passive: true });
 window.addEventListener('touchend', updateTouches);
 window.addEventListener('touchcancel', updateTouches);
 
+
+// MOBILE GLITCH FIX: Only resize if the screen width changes (ignores vertical URL bar collapsing)
+let lastWidth = window.innerWidth;
+
 function resizeDnaCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   dnaCanvas.width = window.innerWidth * dpr;
   dnaCanvas.height = window.innerHeight * dpr;
   dnaCtx.scale(dpr, dpr);
 }
-window.addEventListener('resize', resizeDnaCanvas);
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth !== lastWidth) {
+    lastWidth = window.innerWidth;
+    resizeDnaCanvas();
+  }
+});
 resizeDnaCanvas();
 
 const isMobileDevice = window.innerWidth < 768;
@@ -342,6 +349,7 @@ function drawDNA() {
     const originalDist = Math.abs(rawX2 - rawX1); 
     const stretchRatio = Math.max(0, 1 - (lineDist - originalDist) / 100);
 
+    // Draw connecting lines
     dnaCtx.beginPath();
     dnaCtx.moveTo(state1.x, state1.y);
     dnaCtx.lineTo(state2.x, state2.y);
@@ -349,20 +357,28 @@ function drawDNA() {
     dnaCtx.globalAlpha = stretchRatio; 
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
-    dnaCtx.globalAlpha = 1.0;
 
-    const radius1 = Math.max(0.1, 2 + z1 * 1.5);
+    // DIGITAL LEAVES UPGRADE: Replaced standard arc/circles with sharp Diamonds
+    const radius1 = Math.max(1, 3 + z1 * 2);
     dnaCtx.fillStyle = z1 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = 0.3 + ((z1 + 1) / 2) * 0.7; 
     dnaCtx.beginPath();
-    dnaCtx.arc(state1.x, state1.y, radius1, 0, Math.PI * 2);
+    dnaCtx.moveTo(state1.x, state1.y - radius1);
+    dnaCtx.lineTo(state1.x + radius1, state1.y);
+    dnaCtx.lineTo(state1.x, state1.y + radius1);
+    dnaCtx.lineTo(state1.x - radius1, state1.y);
+    dnaCtx.closePath();
     dnaCtx.fill();
 
-    const radius2 = Math.max(0.1, 2 + z2 * 1.5);
+    const radius2 = Math.max(1, 3 + z2 * 2);
     dnaCtx.fillStyle = z2 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = 0.3 + ((z2 + 1) / 2) * 0.7; 
     dnaCtx.beginPath();
-    dnaCtx.arc(state2.x, state2.y, radius2, 0, Math.PI * 2);
+    dnaCtx.moveTo(state2.x, state2.y - radius2);
+    dnaCtx.lineTo(state2.x + radius2, state2.y);
+    dnaCtx.lineTo(state2.x, state2.y + radius2);
+    dnaCtx.lineTo(state2.x - radius2, state2.y);
+    dnaCtx.closePath();
     dnaCtx.fill();
     
     dnaCtx.globalAlpha = 1.0; 
@@ -372,3 +388,4 @@ function drawDNA() {
 }
 
 drawDNA();
+      
