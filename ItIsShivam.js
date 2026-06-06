@@ -210,7 +210,7 @@ function format(sec) {
 
 generateQuote();
 
-// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (MULTI-TOUCH & DIGITAL LEAVES) ======
+// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (CIRCLES & OPTIMIZED) ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
@@ -249,8 +249,15 @@ window.addEventListener('touchend', updateTouches);
 window.addEventListener('touchcancel', updateTouches);
 
 
-// MOBILE GLITCH FIX: Only resize if the screen width changes (ignores vertical URL bar collapsing)
+// MOBILE GLITCH FIX: Only resize if the screen width changes
 let lastWidth = window.innerWidth;
+let nodes = calculateNodes(); // Initialize node count
+
+function calculateNodes() {
+  if (window.innerWidth < 480) return 40; // Phones
+  if (window.innerWidth < 768) return 55; // Tablets
+  return 75; // PCs
+}
 
 function resizeDnaCanvas() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -262,15 +269,14 @@ function resizeDnaCanvas() {
 window.addEventListener('resize', () => {
   if (window.innerWidth !== lastWidth) {
     lastWidth = window.innerWidth;
+    nodes = calculateNodes(); // Update nodes dynamically on rotation/resize
     resizeDnaCanvas();
   }
 });
 resizeDnaCanvas();
 
-const isMobileDevice = window.innerWidth < 768;
-const nodes = isMobileDevice ? 45 : 70; 
-
-const particles = Array.from({ length: nodes }, () => ({
+// Allow array to handle up to max PC nodes dynamically
+const particles = Array.from({ length: 80 }, () => ({
   dx1: 0, dy1: 0, vx1: 0, vy1: 0,
   dx2: 0, dy2: 0, vx2: 0, vy2: 0
 }));
@@ -324,7 +330,7 @@ function drawDNA() {
   const dotColorAccent = '#ff9f43'; 
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
-  const maxAmplitude = isMobileDevice ? 80 : 180; 
+  const maxAmplitude = (w < 768) ? 80 : 180; 
 
   for(let i = 0; i < nodes; i++) {
     const progressVal = i / nodes; 
@@ -358,27 +364,19 @@ function drawDNA() {
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
 
-    // DIGITAL LEAVES UPGRADE: Replaced standard arc/circles with sharp Diamonds
-    const radius1 = Math.max(1, 3 + z1 * 2);
+    // CIRCLES RESTORED: Beautiful round nodes based on depth
+    const radius1 = Math.max(0.1, 2 + z1 * 1.5);
     dnaCtx.fillStyle = z1 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = 0.3 + ((z1 + 1) / 2) * 0.7; 
     dnaCtx.beginPath();
-    dnaCtx.moveTo(state1.x, state1.y - radius1);
-    dnaCtx.lineTo(state1.x + radius1, state1.y);
-    dnaCtx.lineTo(state1.x, state1.y + radius1);
-    dnaCtx.lineTo(state1.x - radius1, state1.y);
-    dnaCtx.closePath();
+    dnaCtx.arc(state1.x, state1.y, radius1, 0, Math.PI * 2);
     dnaCtx.fill();
 
-    const radius2 = Math.max(1, 3 + z2 * 2);
+    const radius2 = Math.max(0.1, 2 + z2 * 1.5);
     dnaCtx.fillStyle = z2 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = 0.3 + ((z2 + 1) / 2) * 0.7; 
     dnaCtx.beginPath();
-    dnaCtx.moveTo(state2.x, state2.y - radius2);
-    dnaCtx.lineTo(state2.x + radius2, state2.y);
-    dnaCtx.lineTo(state2.x, state2.y + radius2);
-    dnaCtx.lineTo(state2.x - radius2, state2.y);
-    dnaCtx.closePath();
+    dnaCtx.arc(state2.x, state2.y, radius2, 0, Math.PI * 2);
     dnaCtx.fill();
     
     dnaCtx.globalAlpha = 1.0; 
@@ -388,4 +386,3 @@ function drawDNA() {
 }
 
 drawDNA();
-      
