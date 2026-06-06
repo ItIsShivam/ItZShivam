@@ -1,6 +1,6 @@
 // ====== IMMEDIATE THEME LOADING ======
 const savedTheme = localStorage.getItem("theme") || "dark";
-let isLightMode = savedTheme === "light"; // Stored in memory for fast access
+let isLightMode = savedTheme === "light"; 
 
 if (isLightMode) {
   document.body.classList.add("light");
@@ -21,11 +21,9 @@ const quoteText = document.getElementById("quoteText");
 const quoteCategory = document.getElementById("quoteCategory");
 const visualizerMode = document.getElementById("visualizerMode");
 const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d", { alpha: false }); // Optimization: set alpha false if bg is solid, remove if transparent is needed
+const ctx = canvas.getContext("2d", { alpha: false }); 
 
 let isPlaying = false;
-
-// Web Audio Processing pipelines
 let audioCtx = null;
 let source = null;
 let analyser = null;
@@ -75,9 +73,7 @@ function initAudioContext() {
   dataArray = new Uint8Array(analyser.frequencyBinCount);
 }
 
-/* High DPI Canvas Scaling Controller - OPTIMIZED FOR MOBILE */
 function resizeCanvas() {
-  // Cap DPR at 2. Anything higher kills mobile performance for minimal visual gain.
   const dpr = Math.min(window.devicePixelRatio || 1, 2); 
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
@@ -87,8 +83,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-/* Audio Reactive Engine Loop */
-let lastIntensity = 0; // To smooth out heavy CSS repaints
+let lastIntensity = 0; 
 function draw() {
   if (!isPlaying || !analyser) return;
   requestAnimationFrame(draw);
@@ -108,7 +103,6 @@ function draw() {
   const intensity = bass / bassEnd / 255;
   const hue = 180 + intensity * 120;
 
-  // Optimization: Only update DOM styles if the change is noticeable to prevent layout thrashing
   if (Math.abs(lastIntensity - intensity) > 0.05) {
     document.body.style.setProperty(
       "--beat-bg",
@@ -143,7 +137,6 @@ function draw() {
   }
 }
 
-/* UI Action Hooks */
 function togglePlay() {
   const playBtn = document.getElementById("playBtn");
   if (!isPlaying) {
@@ -165,7 +158,6 @@ function toggleTheme() {
   document.body.classList.toggle("light");
   document.body.classList.toggle("dark");
   
-  // Update memory state to prevent heavy DOM lookups in animation loop
   isLightMode = document.body.classList.contains("light");
   localStorage.setItem("theme", isLightMode ? "light" : "dark");
 }
@@ -218,49 +210,44 @@ function format(sec) {
 
 generateQuote();
 
-// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX ======
+// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (MULTI-TOUCH) ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
 let scrollPos = 0;
 window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
-}, { passive: true }); // Optimization: Passive listeners for scrolling
+}, { passive: true });
 
-let mouse = { x: null, y: null, radius: 150 }; 
-let isInteracting = false; 
+// Array to track multiple fingers/cursors
+let activePointers = []; 
+const INTERACTION_RADIUS = 150;
 
-window.addEventListener('mousedown', () => isInteracting = true);
-window.addEventListener('mouseup', () => isInteracting = false);
+// Mouse Listeners
 window.addEventListener('mousemove', (e) => {
-  mouse.x = e.x;
-  mouse.y = e.y;
+  activePointers = [{ x: e.clientX, y: e.clientY }];
 });
 window.addEventListener('mouseout', () => {
-  isInteracting = false;
-  mouse.x = null;
-  mouse.y = null;
+  activePointers = []; // Empties array, triggers natural spring recovery
 });
 
-window.addEventListener('touchstart', (e) => {
-  isInteracting = true;
-  mouse.x = e.touches[0].clientX;
-  mouse.y = e.touches[0].clientY;
-}, { passive: true });
+// Multi-Touch Listeners
+function updateTouches(e) {
+  activePointers = [];
+  for (let i = 0; i < e.touches.length; i++) {
+    activePointers.push({
+      x: e.touches[i].clientX,
+      y: e.touches[i].clientY
+    });
+  }
+}
 
-window.addEventListener('touchmove', (e) => {
-  mouse.x = e.touches[0].clientX;
-  mouse.y = e.touches[0].clientY;
-}, { passive: true });
-
-window.addEventListener('touchend', () => {
-  isInteracting = false;
-  mouse.x = null;
-  mouse.y = null;
-});
+window.addEventListener('touchstart', updateTouches, { passive: true });
+window.addEventListener('touchmove', updateTouches, { passive: true });
+window.addEventListener('touchend', updateTouches);
+window.addEventListener('touchcancel', updateTouches);
 
 function resizeDnaCanvas() {
-  // Cap DPR for performance
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   dnaCanvas.width = window.innerWidth * dpr;
   dnaCanvas.height = window.innerHeight * dpr;
@@ -269,7 +256,6 @@ function resizeDnaCanvas() {
 window.addEventListener('resize', resizeDnaCanvas);
 resizeDnaCanvas();
 
-// Optimization: Reduce node count on mobile to save CPU/GPU overhead
 const isMobileDevice = window.innerWidth < 768;
 const nodes = isMobileDevice ? 45 : 70; 
 
@@ -283,18 +269,22 @@ const FRICTION = 0.82;
 const REPULSION = 18;  
 
 function applyPhysics(rawX, rawY, dx, dy, vx, vy) {
+  // Elastic spring forcing particles back to their original spots
   vx -= dx * SPRING;
   vy -= dy * SPRING;
 
-  if (isInteracting && mouse.x !== null && mouse.y !== null) {
-    const actualX = rawX + dx;
-    const actualY = rawY + dy;
-    const distX = mouse.x - actualX;
-    const distY = mouse.y - actualY;
+  const actualX = rawX + dx;
+  const actualY = rawY + dy;
+
+  // Repulsion calculated for EVERY active pointer (multi-touch support)
+  for (let i = 0; i < activePointers.length; i++) {
+    const pointer = activePointers[i];
+    const distX = pointer.x - actualX;
+    const distY = pointer.y - actualY;
     const distance = Math.sqrt(distX * distX + distY * distY);
     
-    if (distance < mouse.radius) {
-      const force = (mouse.radius - distance) / mouse.radius;
+    if (distance < INTERACTION_RADIUS) {
+      const force = (INTERACTION_RADIUS - distance) / INTERACTION_RADIUS;
       vx -= (distX / distance) * force * REPULSION;
       vy -= (distY / distance) * force * REPULSION;
     }
@@ -319,7 +309,6 @@ function drawDNA() {
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
 
-  // Optimization: Memory state read instead of DOM classList read
   const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
   const dotColorAccent = '#ff9f43'; 
   const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
