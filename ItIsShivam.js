@@ -210,7 +210,7 @@ function format(sec) {
 
 generateQuote();
 
-// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX (CIRCLES & OPTIMIZED) ======
+// ====== BACKGROUND CANVAS: INTERACTIVE 3D DNA MATRIX ======
 const dnaCanvas = document.getElementById('dnaCanvas');
 const dnaCtx = dnaCanvas.getContext('2d');
 
@@ -219,11 +219,9 @@ window.addEventListener('scroll', () => {
   scrollPos = window.scrollY;
 }, { passive: true });
 
-// Array to track multiple fingers/cursors
 let activePointers = []; 
 const INTERACTION_RADIUS = 150;
 
-// Mouse Listeners
 window.addEventListener('mousemove', (e) => {
   activePointers = [{ x: e.clientX, y: e.clientY }];
 });
@@ -232,7 +230,6 @@ document.addEventListener('mouseleave', () => {
   activePointers = []; 
 });
 
-// Multi-Touch Listeners
 function updateTouches(e) {
   activePointers = [];
   for (let i = 0; i < e.touches.length; i++) {
@@ -248,15 +245,13 @@ window.addEventListener('touchmove', updateTouches, { passive: true });
 window.addEventListener('touchend', updateTouches);
 window.addEventListener('touchcancel', updateTouches);
 
-
-// MOBILE GLITCH FIX: Only resize if the screen width changes
 let lastWidth = window.innerWidth;
-let nodes = calculateNodes(); // Initialize node count
+let nodes = calculateNodes(); 
 
 function calculateNodes() {
-  if (window.innerWidth < 480) return 40; // Phones
-  if (window.innerWidth < 768) return 55; // Tablets
-  return 75; // PCs
+  if (window.innerWidth < 480) return 40; 
+  if (window.innerWidth < 768) return 55; 
+  return 75; 
 }
 
 function resizeDnaCanvas() {
@@ -269,13 +264,12 @@ function resizeDnaCanvas() {
 window.addEventListener('resize', () => {
   if (window.innerWidth !== lastWidth) {
     lastWidth = window.innerWidth;
-    nodes = calculateNodes(); // Update nodes dynamically on rotation/resize
+    nodes = calculateNodes();
     resizeDnaCanvas();
   }
 });
 resizeDnaCanvas();
 
-// Allow array to handle up to max PC nodes dynamically
 const particles = Array.from({ length: 80 }, () => ({
   dx1: 0, dy1: 0, vx1: 0, vy1: 0,
   dx2: 0, dy2: 0, vx2: 0, vy2: 0
@@ -286,14 +280,12 @@ const FRICTION = 0.82;
 const REPULSION = 18;  
 
 function applyPhysics(rawX, rawY, dx, dy, vx, vy) {
-  // Elastic spring forcing particles back to their original spots
   vx -= dx * SPRING;
   vy -= dy * SPRING;
 
   const actualX = rawX + dx;
   const actualY = rawY + dy;
 
-  // Repulsion calculated for EVERY active pointer (multi-touch support)
   for (let i = 0; i < activePointers.length; i++) {
     const pointer = activePointers[i];
     const distX = pointer.x - actualX;
@@ -321,25 +313,18 @@ function drawDNA() {
   
   dnaCtx.clearRect(0, 0, w, h);
   
-  // --- RESPONSIVE FIXES ---
-  // Center on PC, but push to the right edge (85% of screen width) on mobile/tablet
-  const centerX = w < 950 ? w * 0.85 : w / 2;
-  
-  // Reduce the width (amplitude) of the DNA spiral on smaller screens
+  // Responsive alignment
+  const centerX = w < 950 ? w * 0.80 : w / 2;
   const maxAmplitude = w < 480 ? 40 : (w < 950 ? 70 : 180); 
-  
-  // Lower the opacity on mobile/tablet so it acts like a watermark
-  const opacityMultiplier = w < 950 ? 0.4 : 1.0; 
-  // ------------------------
+  const opacityMultiplier = w < 950 ? 0.9 : 1.0; 
 
   const time = Date.now() * 0.0003; 
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
 
+  // Use dynamic colors based on theme
   const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
-  const dotColorAccent = '#ff9f43'; 
-  
-  // Adjust line color opacity based on screen size
+  const dotColorAccent = isLightMode ? '#059669' : '#ff9f43'; 
   const baseLineAlpha = (isLightMode ? 0.1 : 0.1) * opacityMultiplier;
   const lineColor = `rgba(${isLightMode ? '0,0,0' : '255,255,255'}, ${baseLineAlpha})`;
 
@@ -366,7 +351,6 @@ function drawDNA() {
     const originalDist = Math.abs(rawX2 - rawX1); 
     const stretchRatio = Math.max(0, 1 - (lineDist - originalDist) / 100);
 
-    // Draw connecting lines
     dnaCtx.beginPath();
     dnaCtx.moveTo(state1.x, state1.y);
     dnaCtx.lineTo(state2.x, state2.y);
@@ -375,7 +359,6 @@ function drawDNA() {
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
 
-    // Draw Circle 1
     const radius1 = Math.max(0.1, 2 + z1 * 1.5);
     dnaCtx.fillStyle = z1 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = (0.3 + ((z1 + 1) / 2) * 0.7) * opacityMultiplier; 
@@ -383,7 +366,6 @@ function drawDNA() {
     dnaCtx.arc(state1.x, state1.y, radius1, 0, Math.PI * 2);
     dnaCtx.fill();
 
-    // Draw Circle 2
     const radius2 = Math.max(0.1, 2 + z2 * 1.5);
     dnaCtx.fillStyle = z2 > 0 ? dotColorAccent : dotColorMain; 
     dnaCtx.globalAlpha = (0.3 + ((z2 + 1) / 2) * 0.7) * opacityMultiplier; 
@@ -396,3 +378,5 @@ function drawDNA() {
   
   requestAnimationFrame(drawDNA);
 }
+
+drawDNA();
