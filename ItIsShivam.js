@@ -1,24 +1,49 @@
-// ====== SYSTEM-AWARE THEME LOADING ======
+// ====== SYSTEM-AWARE THEME LOADING & LIVE SYNC ======
 const savedTheme = localStorage.getItem("theme");
 
 // Default to Light Mode, but check system preferences
 let isLightMode = true; 
 
+// 1. Initial Load Check
 if (savedTheme !== null) {
-  // If the user previously clicked the theme button, respect their choice
+  // Respect previously saved choice
   isLightMode = savedTheme === "light"; 
 } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  // If no choice was saved, check if their device is in dark mode
+  // Match system dark mode
   isLightMode = false; 
 }
 
-// Apply the theme to the body
-if (isLightMode) {
-  document.body.classList.add("light");
-  document.body.classList.remove("dark");
-} else {
-  document.body.classList.add("dark");
-  document.body.classList.remove("light");
+// Function to apply the theme to the DOM
+function applyTheme() {
+  if (isLightMode) {
+    document.body.classList.add("light");
+    document.body.classList.remove("dark");
+  } else {
+    document.body.classList.add("dark");
+    document.body.classList.remove("light");
+  }
+}
+
+// Apply initially
+applyTheme();
+
+// 2. LIVE SYSTEM THEME LISTENER
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+  // event.matches is true if the system just switched to Dark Mode
+  isLightMode = !event.matches;
+  
+  // Apply the new theme immediately
+  applyTheme();
+  
+  // Update local storage so the new system preference is remembered
+  localStorage.setItem("theme", isLightMode ? "light" : "dark");
+});
+
+// Update the manual toggle function to use the new applyTheme helper
+function toggleTheme() {
+  isLightMode = !isLightMode;
+  applyTheme();
+  localStorage.setItem("theme", isLightMode ? "light" : "dark");
 }
 
 // ====== AUDIO & UI CONTROLS ELEMENT MAPPING ======
