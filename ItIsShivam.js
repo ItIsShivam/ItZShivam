@@ -1,7 +1,18 @@
-// ====== IMMEDIATE THEME LOADING ======
-const savedTheme = localStorage.getItem("theme") || "dark";
-let isLightMode = savedTheme === "light"; 
+// ====== SYSTEM-AWARE THEME LOADING ======
+const savedTheme = localStorage.getItem("theme");
 
+// Default to Light Mode, but check system preferences
+let isLightMode = true; 
+
+if (savedTheme !== null) {
+  // If the user previously clicked the theme button, respect their choice
+  isLightMode = savedTheme === "light"; 
+} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  // If no choice was saved, check if their device is in dark mode
+  isLightMode = false; 
+}
+
+// Apply the theme to the body
 if (isLightMode) {
   document.body.classList.add("light");
   document.body.classList.remove("dark");
