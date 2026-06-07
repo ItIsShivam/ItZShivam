@@ -321,16 +321,27 @@ function drawDNA() {
   
   dnaCtx.clearRect(0, 0, w, h);
   
-  const centerX = w / 2;
+  // --- RESPONSIVE FIXES ---
+  // Center on PC, but push to the right edge (85% of screen width) on mobile/tablet
+  const centerX = w < 950 ? w * 0.85 : w / 2;
+  
+  // Reduce the width (amplitude) of the DNA spiral on smaller screens
+  const maxAmplitude = w < 480 ? 40 : (w < 950 ? 70 : 180); 
+  
+  // Lower the opacity on mobile/tablet so it acts like a watermark
+  const opacityMultiplier = w < 950 ? 0.4 : 1.0; 
+  // ------------------------
+
   const time = Date.now() * 0.0003; 
   const scrollRotation = scrollPos * 0.004; 
   const totalRotation = time + scrollRotation;
 
   const dotColorMain = isLightMode ? 'rgba(10, 10, 10, 0.4)' : 'rgba(255, 255, 255, 0.5)';
   const dotColorAccent = '#ff9f43'; 
-  const lineColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
-
-  const maxAmplitude = (w < 768) ? 80 : 180; 
+  
+  // Adjust line color opacity based on screen size
+  const baseLineAlpha = (isLightMode ? 0.1 : 0.1) * opacityMultiplier;
+  const lineColor = `rgba(${isLightMode ? '0,0,0' : '255,255,255'}, ${baseLineAlpha})`;
 
   for(let i = 0; i < nodes; i++) {
     const progressVal = i / nodes; 
@@ -360,21 +371,22 @@ function drawDNA() {
     dnaCtx.moveTo(state1.x, state1.y);
     dnaCtx.lineTo(state2.x, state2.y);
     dnaCtx.strokeStyle = lineColor;
-    dnaCtx.globalAlpha = stretchRatio; 
+    dnaCtx.globalAlpha = stretchRatio * opacityMultiplier; 
     dnaCtx.lineWidth = 1;
     dnaCtx.stroke();
 
-    // CIRCLES RESTORED: Beautiful round nodes based on depth
+    // Draw Circle 1
     const radius1 = Math.max(0.1, 2 + z1 * 1.5);
     dnaCtx.fillStyle = z1 > 0 ? dotColorAccent : dotColorMain; 
-    dnaCtx.globalAlpha = 0.3 + ((z1 + 1) / 2) * 0.7; 
+    dnaCtx.globalAlpha = (0.3 + ((z1 + 1) / 2) * 0.7) * opacityMultiplier; 
     dnaCtx.beginPath();
     dnaCtx.arc(state1.x, state1.y, radius1, 0, Math.PI * 2);
     dnaCtx.fill();
 
+    // Draw Circle 2
     const radius2 = Math.max(0.1, 2 + z2 * 1.5);
     dnaCtx.fillStyle = z2 > 0 ? dotColorAccent : dotColorMain; 
-    dnaCtx.globalAlpha = 0.3 + ((z2 + 1) / 2) * 0.7; 
+    dnaCtx.globalAlpha = (0.3 + ((z2 + 1) / 2) * 0.7) * opacityMultiplier; 
     dnaCtx.beginPath();
     dnaCtx.arc(state2.x, state2.y, radius2, 0, Math.PI * 2);
     dnaCtx.fill();
@@ -384,5 +396,3 @@ function drawDNA() {
   
   requestAnimationFrame(drawDNA);
 }
-
-drawDNA();
