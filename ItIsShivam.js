@@ -1411,18 +1411,18 @@ function executeTerminalCommand(command, bodyEl) {
       responseLine.innerHTML = `Souman Maity is a Business Operations Accounts & Sales Executive and an MBA Business/Data Analytics candidate. He is specialized in Custom Linux setups, financial administration, spreadsheet optimization, and workflow automation.`;
       break;
     case "neofetch":
-      responseLine.innerHTML = `<pre class="neofetch-art">
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_/\\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>shivam</b>
-   &nbsp;&gt;&nbsp;&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;------
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OS: Debian GNU/Linux 13 (trixie) x86_64
-   &nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kernel: Linux 6.12.94+deb13-amd64
-   &nbsp;&nbsp;/_&nbsp;/_______&nbsp;Uptime: 1 hour, 41 mins
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Packages: 1709 (dpkg)
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Shell: bash 5.2.37
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;WM: Sway 1.10.1 (Wayland)
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Theme: catppuccin-mocha-teal [GTK2/3]
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Terminal: foot 1.21.0
-</pre>`;
+      responseLine.innerHTML = '<pre class="neofetch-art">' +
+        '     _,---._    <b>shivam</b>\n' +
+        '   ,\'       `.  ------\n' +
+        '  /   ,-"-.   \\ OS: Debian GNU/Linux 13 (trixie) x86_64\n' +
+        ' |   |    J   | Kernel: Linux 6.12.94+deb13-amd64\n' +
+        ' \\   \\    \'   / Uptime: 1 hour, 41 mins\n' +
+        '  `.  `---\' ,\'  Packages: 1709 (dpkg)\n' +
+        '    `\'--..--\'   Shell: bash 5.2.37\n' +
+        '                WM: Sway 1.10.1 (Wayland)\n' +
+        '                Theme: catppuccin-mocha-teal [GTK2/3]\n' +
+        '                Terminal: foot 1.21.0\n' +
+        '</pre>';
       break;
     case "skills":
       responseLine.innerHTML = `Skills Matrix:<br>
