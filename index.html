@@ -8,18 +8,23 @@
   
   <!-- Website Logo / Favicon -->
   <link rel="icon" type="image/png" href="MyLogo.png?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="ItIsShivam.css">
 </head>
 
 <body class="light animated-bg">
-  <canvas id="dnaCanvas"></canvas>
+  <canvas id="webgl-canvas"></canvas>
 
   <div class="portfolio-layout">
 
     <main class="portfolio-content">
       <section class="hero fade-in">
-        <h1>Hi, I'm Souman Maity.</h1>
-        <h2>Business Operations & Tech Enthusiast</h2>
+        <span class="cyber-detail top-right">[SYS_BOOT_SUCCESS]</span>
+        <span class="cyber-detail bottom-left">[USER_ID: SOUMAN_M]</span>
+        <h1 data-decrypt>Hi, I'm Souman Maity.</h1>
+        <h2 data-decrypt>Business Operations & Tech Enthusiast</h2>
         <p>I aim to work and succeed in a stimulating and challenging environment, driving company success while exploring opportunities for advancement.</p>
         <div class="hero-actions">
           <a href="#experience" class="btn-primary">View Experience</a>
@@ -28,7 +33,8 @@
       </section>
 
       <section id="experience" class="portfolio-section fade-in">
-        <h3>Professional Experience</h3>
+        <span class="cyber-detail top-right">[DEB_EXP_LOG]</span>
+        <h3 data-decrypt>Professional Experience</h3>
         <ol class="timeline">
           <li class="timeline-item">
             <h4>Executive - Accounts and Sales Support</h4>
@@ -51,7 +57,8 @@
       </section>
 
       <section id="education" class="portfolio-section fade-in">
-        <h3>Education</h3>
+        <span class="cyber-detail top-right">[DATA_EDU_MATRIX]</span>
+        <h3 data-decrypt>Education</h3>
         <ol class="timeline">
           <li class="timeline-item">
             <h4>MBA (Pursuing) - Business Analytics / Data Analytics</h4>
@@ -69,7 +76,8 @@
       </section>
 
       <section id="skills" class="portfolio-section fade-in">
-        <h3>Skills & Tools</h3>
+        <span class="cyber-detail top-right">[CORE_TOOL_SYS]</span>
+        <h3 data-decrypt>Skills & Tools</h3>
         <div class="tags-container">
           <span class="skill-tag">HTML & CSS</span>
           <span class="skill-tag">Linux (Debian, Fedora, Arch)</span>
@@ -79,8 +87,18 @@
         </div>
       </section>
 
+      <section id="analytics" class="portfolio-section fade-in">
+        <span class="cyber-detail top-right">[ANALYTICS_PANEL]</span>
+        <h3 data-decrypt>Analytics Showcase</h3>
+        <p class="analytics-desc" style="opacity:0.8; margin-bottom: 25px; line-height:1.6; font-size:1rem;">An interactive visual representation of technical, analytic, and business operations capabilities.</p>
+        <div class="analytics-container" style="display:flex; justify-content:center; align-items:center; background: rgba(0,0,0,0.15); border-radius:16px; padding:20px; border: 1px solid rgba(255,255,255,0.04);">
+          <canvas id="analytics-chart"></canvas>
+        </div>
+      </section>
+
       <section id="interests" class="portfolio-section fade-in">
-        <h3>Interests & Languages</h3>
+        <span class="cyber-detail top-right">[INT_LANG_DATA]</span>
+        <h3 data-decrypt>Interests & Languages</h3>
         <div class="split-section">
           <div>
             <h4>Interests</h4>
@@ -103,14 +121,36 @@
       </section>
 
       <section id="custom-os" class="portfolio-section fade-in">
-        <h3>Custom OS Build</h3>
+        <span class="cyber-detail top-right">[DEBIAN_SHELL_ACTIVE]</span>
+        <h3 data-decrypt>Custom OS Build</h3>
         <div class="os-card">
-          <img src="MySetup.jpeg" alt="Custom Debian Operating System Setup" class="setup-img" loading="lazy" />
+          <img src="MySetup.webp" alt="Custom Debian Operating System Setup" class="setup-img" loading="lazy" />
           <p class="os-description">
             I created my own operating system environment for myself using Debian, customizing it from the ground up to optimize my workflow and system performance.
           </p>
+          
+          <!-- Interactive Terminal Widget -->
+          <div class="terminal-container">
+            <div class="terminal-header">
+              <div class="terminal-buttons">
+                <span class="btn-terminal close"></span>
+                <span class="btn-terminal minimize"></span>
+                <span class="btn-terminal maximize"></span>
+              </div>
+              <div class="terminal-title">shivam@debian: ~</div>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+              <div class="terminal-line">Welcome to Shivam's interactive Debian environment.</div>
+              <div class="terminal-line">Type <span class="term-highlight">help</span> to view available commands.</div>
+              <div class="terminal-input-line">
+                <span class="terminal-prompt">shivam@debian:~$</span>
+                <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" aria-label="Terminal Input" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+
 
       <footer class="site-footer fade-in">
         <div class="thanks-text">Thanks for visiting! &copy; <span id="year"></span></div>
@@ -138,7 +178,7 @@
         <div class="row">
           <button onclick="generateQuote()">Inspire</button>
           <button onclick="togglePlay()" id="playBtn">Play / Pause</button>
-          <button onclick="toggleTheme()">Theme</button>
+          <button id="themeToggleBtn">Theme</button>
         </div>
 
         <div class="row slider-row">
@@ -189,6 +229,16 @@
   </div>
 
   <audio id="audio" preload="metadata"></audio>
+  
+  <!-- Togglable CRT Scanlines Overlay -->
+  <div id="crt-overlay" class="crt-scanlines"></div>
+
+  <!-- Custom Cursor Overlay -->
+  <div class="custom-cursor-dot" id="custom-cursor-dot"></div>
+  <div class="custom-cursor-ring" id="custom-cursor-ring"></div>
+  <canvas id="cursor-trail-canvas"></canvas>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="ItIsShivam.js"></script>
 </body>
 </html>
