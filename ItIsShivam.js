@@ -1414,14 +1414,14 @@ function executeTerminalCommand(command, bodyEl) {
       responseLine.innerHTML = '<pre class="neofetch-art">' +
         '     _,---._    <b>shivam</b>\n' +
         '   ,\'       `.  ------\n' +
-        '  /   ,-"-.   \\ OS: Debian GNU/Linux 13 (trixie) x86_64\n' +
-        ' |   |    J   | Kernel: Linux 6.12.94+deb13-amd64\n' +
-        ' \\   \\    \'   / Uptime: 1 hour, 41 mins\n' +
-        '  `.  `---\' ,\'  Packages: 1709 (dpkg)\n' +
-        '    `\'--..--\'   Shell: bash 5.2.37\n' +
-        '                WM: Sway 1.10.1 (Wayland)\n' +
-        '                Theme: catppuccin-mocha-teal [GTK2/3]\n' +
-        '                Terminal: foot 1.21.0\n' +
+        '  /   ,,---.  \\ OS: Debian GNU/Linux 13 (trixie) x86_64\n' +
+        ' /   /      \\  \\ Kernel: Linux 6.12.94+deb13-amd64\n' +
+        '|   |       |  | Uptime: 1 hour, 41 mins\n' +
+        ' \\   `----\'   /  Packages: 1709 (dpkg)\n' +
+        '  `.________,\'   Shell: bash 5.2.37\n' +
+        '                 WM: Sway 1.10.1 (Wayland)\n' +
+        '                 Theme: catppuccin-mocha-teal [GTK2/3]\n' +
+        '                 Terminal: foot 1.21.0\n' +
         '</pre>';
       break;
     case "skills":
